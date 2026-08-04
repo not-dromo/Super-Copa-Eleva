@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h1 class="teams-title">Times</h1>
+
+<div class="all-teams">
+    <div class="team-box">
+        <a href="{{ url_for('team_page', team_id=1) }}">
+            <img src="{{ url_for('static', filename='images/Team_badges/Aposendaros_2019_menor.png') }}" alt="Escudo Aposendaros" class="badge">
+            <div class="link-to-team-page">
+                <h1 class="team-name-teams">Aposendaros</h1>
+                <h3 class="team-year-teams">2019</h3>
+            </div>
+        </a>
+    </div>
+
+    <div class="team-box">
+        <a href="{{ url_for('team_page', team_id=2) }}">
+            <img src="{{ url_for('static', filename='images/Team_badges/Botei_Tirei_2020.png') }}" alt="Escudo Botei Tirei" class="badge">
+            <div class="link-to-team-page">
+                <h1 class="team-name-teams">Botei Tirei</h1>
+                <h3 class="team-year-teams">2020</h3>
+            </div>
+        </a>
+    </div>
+
+    <div class="team-box">
+        <a href="{{ url_for('team_page', team_id=3) }}">
+            <img src="{{ url_for('static', filename='images/Team_badges/David_A_Williams_2021.png') }}" alt="Escudo David A. Williams" class="badge">
+            <div class="link-to-team-page">
+                <h1 class="team-name-teams">David A. W.</h1>
+                <h3 class="team-year-teams">2021</h3>
+            </div>
+        </a>
+    </div>
+
+    <div class="team-box">
+        <a href="{{ url_for('team_page', team_id=4) }}">
+            <img src="{{ url_for('static', filename='images/Team_badges/Inter_de_Milanbe_2022.png') }}" alt="Escudo Inter de Milanbe" class="badge">
+            <div class="link-to-team-page">
+                <h1 class="team-name-teams">I. de Milanbe</h1>
+                <h3 class="team-year-teams">2022</h3>
+            </div>
+        </a>
+    </div>
+
+    <div class="team-box">
+        <a href="{{ url_for('team_page', team_id=5) }}">
+            <img src="{{ url_for('static', filename='images/Team_badges/Parinha_2023.png') }}" alt="Escudo Parinha" class="badge">
+            <div class="link-to-team-page">
+                <h1 class="team-name-teams">Parinha</h1>
+                <h3 class="team-year-teams">2023</h3>
+            </div>
+        </a>
+    </div>
+
+    <div class="team-box">
+        <a href="{{ url_for('team_page', team_id=6) }}">
+            <img src="{{ url_for('static', filename='images/Team_badges/Selemanca_2024.png') }}" alt="Escudo Selemanca" class="badge">
+            <div class="link-to-team-page">
+                <h1 class="team-name-teams">Selemanca</h1>
+                <h3 class="team-year-teams">2024</h3>
+            </div>
+        </a>
+    </div>
+
+    <div class="team-box">
+        <a href="{{ url_for('team_page', team_id=7) }}">
+            <img src="{{ url_for('static', filename='images/Team_badges/UbiraNove_Family_2025.png') }}" alt="Escudo UbiraNove Family" class="badge">
+            <div class="link-to-team-page">
+                <h1 class="team-name-teams">UbiraNove</h1>
+                <h3 class="team-year-teams">2025</h3>
+            </div>
+        </a>
+    </div>
+
+    <div class="team-box">
+        <a href="{{ url_for('team_page', team_id=8) }}">
+            <img src="{{ url_for('static', filename='images/Team_badges/No_Badge.png') }}" alt="Escudo Próximo Time 2026" class="badge">
+            <div class="link-to-team-page">
+                <h1 class="team-name-teams">?</h1>
+                <h3 class="team-year-teams">2026</h3>
+            </div>
+        </a>
+    </div>
+</div>
+
+{% endblock %}

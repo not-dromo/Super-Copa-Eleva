@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="page-header-wrapper">
+    <h1 id="cool-title1">Jogadores</h1>
+</div>
+
+<div class="table-wrapper">
+
+    <table id="playersTable">
+
+        <thead>
+            <tr>
+                <th id="column-name" data-key="name" data-type="string">Nome</th>
+                <th id="column-nickname" data-key="nickname" data-type="string">Apelido</th>
+                <th id="column-team" data-key="team" data-type="string">time</th>
+                <th class="rows-with-numbers" id="column-matches-played" data-key="matches_played" data-type="number">J</th> <!--partidas jogadas-->
+                <th class="rows-with-numbers" id="column-goals" data-key="goals" data-type="number">G</th> <!--gols marcados-->
+                <th class="rows-with-numbers" id="column-assists" data-key="assists" data-type="number">A</th> <!--assistências-->
+                <th class="rows-with-numbers" id="column-yellow-cards" data-key="yellow_cards" data-type="number">CA</th> <!--cartões amarelos-->
+                <th class="rows-with-numbers" id="column-red-cards" data-key="red_cards" data-type="number">CV</th> <!--cartões vermelhos-->
+                <th class="rows-with-numbers" id="column-poma" data-key="player_of_the_match" data-type="number">JP</th> <!--jogador da partida-->
+                <th class="rows-with-numbers" id="column-pora" data-key="player_of_the_round" data-type="number">JR</th> <!--jogador da rodada-->
+                <th class="rows-with-numbers" id="column-tora" data-key="team_of_the_rounds" data-type="number">SR</th> <!--seleção da rodada-->
+                <th class="rows-with-numbers" id="column-titles" data-key="championship_titles" data-type="number">T</th> <!--títulos-->
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for player in players %}
+            <tr>
+                <td class="align-left" data-key="name" data-value="{{ player.name }}">
+                    <a class="name-in-table" href="{{ url_for('player_stats', player_id=player.id)}}">{{ player.name }}</a>
+                </td>
+
+                <td id="nickname-padding" data-key="nickname" data-value="{{ player.nickname or '\uFFFF' }}">
+                    <a class="name-in-table" href="{{ url_for('player_stats', player_id=player.id)}}">{{ player.nickname or '' }}</a>
+                </td>
+
+                <td data-key="team" data-value="{{ player.team.name if player.team else 'Sem time' }}">
+                    {% if player.team %}
+                        <a class="name-in-table" href="{{ url_for('team_page', team_id=player.team.id) }}">{{ player.team.name }}</a>
+                    {% else %}
+                        Sem time
+                    {% endif %}
+                </td>
+                
+                <td data-key="matches_played" data-value="{{ player.matches_played }}">{{ player.matches_played }}</td>
+                <td data-key="goals" data-value="{{ player.goals }}">{{ player.goals }}</td>
+                <td data-key="assists" data-value="{{ player.assists }}">{{ player.assists }}</td>
+                <td data-key="yellow_cards" data-value="{{ player.yellow_cards }}">{{ player.yellow_cards }}</td>
+                <td data-key="red_cards" data-value="{{ player.red_cards }}">{{ player.red_cards }}</td>
+                <td data-key="player_of_the_match" data-value="{{ player.player_of_the_match }}">{{ player.player_of_the_match }}</td>
+                <td data-key="player_of_the_round" data-value="{{ player.player_of_the_round }}">{{ player.player_of_the_round }}</td>
+                <td data-key="team_of_the_rounds" data-value="{{ player.team_of_the_rounds }}">{{ player.team_of_the_rounds }}</td>
+                <td data-key="championship_titles" data-value="{{ player.championship_titles }}">{{ player.championship_titles }}</td>
+                            </tr>
+            {% endfor %}
+        </tbody>
+
+    </table>
+
+</div>
+
+
+{% endblock %}

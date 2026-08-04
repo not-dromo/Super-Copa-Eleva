@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="standings-page-title">
+    <h1>Tabela</h1>
+</div>
+
+<div class="standings-table-wrapper">
+
+    <table class="standings">
+
+        <thead>
+            <tr>
+                <th class="rows-with-numbers-standings" id="column-position" data-key="position" data-type="number">#</th> <!--posição-->
+                <th class="rows-with-text-standings"    id="column-team" data-key="team" data-type="string">Time</th> <!--nome do time-->
+                <th class="rows-with-numbers-standings" id="column-matches-played" data-key="matches_played" data-type="number">J</th> <!--partidas jogadas-->
+                <th class="rows-with-numbers-standings" id="column-wins" data-key="wins" data-type="number">V</th> <!--vitórias-->
+                <th class="rows-with-numbers-standings" id="column-draws" data-key="draws" data-type="number">E</th> <!--empates-->
+                <th class="rows-with-numbers-standings" id="column-losses" data-key="losses" data-type="number">D</th> <!--derrotas-->
+                <th class="rows-with-numbers-standings" id="column-goals-for" data-key="goals-for" data-type="number">GP</th> <!--gols pró-->
+                <th class="rows-with-numbers-standings" id="column-goals-against" data-key="goals-against" data-type="number">GC</th> <!--gols contra-->
+                <th class="rows-with-numbers-standings" id="column-goal-difference" data-key="goal-difference" data-type="number">SG</th> <!--saldo de gols-->
+                <th class="rows-with-numbers-standings" id="column-yellow-cards" data-key="yellow_cards" data-type="number">CA</th> <!--cartões amarelos-->
+                <th class="rows-with-numbers-standings" id="column-red-cards" data-key="red_cards" data-type="number">CV</th> <!--cartões vermelhos-->
+                <th class="rows-with-numbers-standings" id="column-points" data-key="points" data-type="number">P</th> <!--pontos-->
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for team in teams %}
+            <tr>
+                <td>{{ loop.index }}</td>
+                <td>
+                    <a href="{{ url_for('team_page', team_id=team.id) }}">
+                        <img src="{{ url_for('static', filename='images/Team_badges/' ~ team.badge) }}" class="team-badge">
+                        {{ team.name }} ({{ team.foundation_year }})
+                    </a>
+                </td>
+                <td>{{ team.matches }}</td>
+                <td>{{ team.wins }}</td>
+                <td>{{ team.draws }}</td>
+                <td>{{ team.losses }}</td>
+                <td>{{ team.goals_for }}</td>
+                <td>{{ team.goals_against }}</td>
+                <td>{{ team.goal_difference }}</td>
+                <td>-</td>
+                <td>-</td>
+                <td>{{ team.points }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+
+    </table>
+
+</div>
+
+
+{% endblock %}

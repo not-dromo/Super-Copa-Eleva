@@ -1,0 +1,15 @@
+#ambiente
+.env
+venv/
+__pycache__/
+*.pyc
+
+#banco de dados
+*.dump
+backup_super_copa_eleva.sql
+
+#testes/lixo
+tests.sql
+
+#outros
+.vscode/

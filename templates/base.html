@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Super Copa Eleva</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="{{ url_for('static', filename='sort.js') }}"></script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">    
+
+    <meta name="view-transition" content="same-origin">
+</head>
+
+<body>
+    <div class="header">
+        <a href="/main_menu">
+            <img src="/static/images/logo/logo.png" alt="Super Copa Eleva logo" class="header-logo">
+        </a>
+        
+        <a href="/matches" class="header-button">
+            Partidas
+        </a>
+        
+        <a href="/standings" class="header-button">
+            Tabelas
+        </a>
+        
+        <a href="/teams" class="header-button">
+            Times
+        </a>
+        
+        <a href="/players" class="header-button">
+            Jogadores
+        </a>  
+    </div>
+
+    {% block content %}
+    {% endblock %}
+
+</body>
+
+</html>

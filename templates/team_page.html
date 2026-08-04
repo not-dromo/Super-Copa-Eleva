@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% from '_macros.html' import trophy_display %}
+
+{% block content %}
+
+<div class="all-content-of-team-page">
+    <div class="player-display-team-page">
+        <div class="display-box-team-page">
+            <img src="{{ url_for('static', filename='images/Team_badges/' ~ badge_file) }}" class="team-badge">
+            <img id="big-player-photo" src="{{ captain.photo_url or default_photo }}" class="player-photo">
+            <h2 id="big-player-name">{{ captain.name }}</h2>
+            <p id="big-player-nickname">{{ captain.nickname or '' }}</p>
+        </div>
+    </div>
+    <div class="team-players">
+
+        {% for player in players %}
+        
+        <div class="player" data-name="{{ player.name }}" data-nickname="{{ player.nickname or ''}}" data-photo="{{ player.photo_url or default_photo }}" data-captain="{{ '1' if player.captain == 1 else '0'}}">
+            <a class="player-box" href="{{ url_for('player_stats', player_id=player.id) }}">
+                <img src="{{ player.photo_url or default_photo }}" class="player-photo-miniature">
+                <h3 class="smaller-player-name">{{player.name}}</h3>
+            </a>
+        </div> 
+
+        {% endfor %}
+    
+    </div>
+</div>
+
+{% endblock %}

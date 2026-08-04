@@ -1,0 +1,12 @@
+{% macro trophy_display(value, icon_path, max_icons=6) %}
+    {% if value == 0 %}
+        <span class="stat-empty"></span>
+    {% else %}
+        {% for i in range(1, [value, max_icons]|min + 1) %}
+            <img src="{{ icon_path }}" class="trophy-icon" alt="troféu">
+        {% endfor %}
+        {% if value > max_icons %}
+            <span class="stat-extra">+{{ value - max_icons }}</span>
+        {% endif %}
+    {% endif %}
+{% endmacro %}

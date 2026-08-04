@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% from '_macros.html' import trophy_display %}
+
+{% block content %}
+
+<div class="all-content-of-player-stats">
+    <div class="player-display">
+        <div class="display-box">
+            <img src="{{ url_for('static', filename='images/Team_badges/' ~ badge_file) }}" class="team-badge">
+            <img src="{{ player.photo_url or default_photo }}" class="player-photo">
+            <h1 class="player-name">{{ player.name }}{% if player.captain %} (C){% endif %}</h1>
+            <h3 class="player-nickname">{{ player.nickname or ''}}</h3>
+        </div>
+    </div>
+    <div class="player-stats">
+        <div class="matches-goals-assists">
+            <div class="corner-box-left matches-goals-assists-box">
+                <h1 class="stats-number">{{ player.matches_played }}</h1>
+                <h3 class="what-stat">Partidas</h3>
+            </div>
+            <div class="matches-goals-assists-box">
+                <h1 class="stats-number">{{ goals }}</h1>
+                <h3 class="what-stat">Gols</h3>
+            </div>
+            <div class="corner-box-right matches-goals-assists-box">
+                <h1 class="stats-number">{{ assists }}</h1>
+                <h3 class="what-stat">Assistências</h3>
+            </div>
+        </div> 
+        <div class="player-awards">
+            <div class="player-awards-box">
+                <h3 class="what-award">Jogador da Partida</h3>
+                <div class="trophies">
+                    {{ trophy_display(poma, url_for('static', filename='images/icons/poma_trophy.svg')) }}
+                </div>
+            </div>
+            <div class="player-awards-box">
+                <h3 class="what-award">Jogador da Rodada</h3>
+                <div class="trophies pora-trophy">
+                    {{ trophy_display(pora, url_for('static', filename='images/icons/pora_trophy.svg')) }}
+                </div>
+            </div>
+            <div class="player-awards-box">
+                <h3 class="what-award">Seleção da Rodada</h3>
+                <div class="trophies">
+                    {{ trophy_display(totr, url_for('static', filename='images/icons/totr_trophy.svg')) }}
+                </div>
+            </div>
+            <div class="player-awards-box">
+                <h3 class="what-award">Título</h3>
+                <div class="trophies">
+                    {{ trophy_display(player.championship_titles, url_for('static', filename='images/icons/title_trophy.svg')) }}
+                </div>
+            </div>
+        </div> 
+
+    </div>
+</div>
+
+{% endblock %}

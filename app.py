@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, redirect, abort
 from models import db, Player, Team, Championship, Standing, Round, Match, Goal, Assist, YellowCard, RedCard, TeamOfTheRound, ChampionshipTitle
 from sqlalchemy import func
+from sqlalchemy.orm import aliased
 import models
 import os
 from dotenv import load_dotenv
@@ -79,8 +80,19 @@ def get_teams_data():
     all_team_goals_against_away = db.session.query(Match.away_team_id, func.sum(Match.home_team_goals).label('goal_against_away')).group_by(Match.away_team_id).subquery()
     all_team_goals_against_home = db.session.query(Match.home_team_id, func.sum(Match.away_team_goals).label('goal_against_home')).group_by(Match.home_team_id).subquery()
 
-
     return (all_games_away, all_games_home, all_wins_away, all_wins_home, all_losses_away, all_losses_home, all_team_goals_away, all_team_goals_home, all_team_goals_against_away, all_team_goals_against_home)
+
+def get_matches_data():
+    Home_team = aliased(Team)
+    Away_team = aliased(Team)
+
+    results = db.session.query(Match, Home_team, Away_team)\
+        .join(Home_team, Match.home_team_id == Home_team.id)\
+        .join(Away_team, Match.away_team_id == Away_team.id)\
+        .order_by(Match.match_date.desc())\
+        .all()
+
+    return results
 
 TEAM_BADGES = {
     0: 'No_Badge.png',
@@ -100,8 +112,6 @@ DEFAULT_PLAYER_PHOTO_WHITE = "https://res.cloudinary.com/ccpmanza/image/upload/n
 def index():
     #empty
     return render_template('index.html')
-
-
 
 @app.route('/main_menu')
 def main_menu():
@@ -262,18 +272,27 @@ def standings():
     
     return render_template('standings.html', teams=team_data)
 
-
-
-
-
-
-
-
-#em construção ainda
 @app.route('/matches')
 def matches():
-    #nada aqui ainda
-    return render_template('matches.html')
+    all_matches = get_matches_data()
+
+    matches_by_date = {}
+    for match, home_team, away_team in all_matches:
+        match_day = match.match_date.date() if match.match_date else None
+
+        match_data = {
+            "id": match.id,
+            "home_team_name": home_team.name,
+            "away_team_name": away_team.name,
+            "home_team_goals": match.home_team_goals,
+            "away_team_goals": match.away_team_goals,
+            "home_team_badge": TEAM_BADGES.get(home_team.id, 'No_Badge.png'),
+            "away_team_badge": TEAM_BADGES.get(away_team.id, 'No_Badge.png'),
+        }
+
+        matches_by_date.setdefault(match_day, []).append(match_data)
+    
+    return render_template('matches.html', matches_by_date=matches_by_date)
 
 
 

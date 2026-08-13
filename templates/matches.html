@@ -4,4 +4,13 @@
 
 <h1>EM CONSTRUÇÃO</h1>
 
+{% for date, matches_list in matches_by_date.items() %}
+    <h2>{{ date }}</h2>
+    
+    {% for match in matches_list %}
+        <p>{{ match.home_team_name }} ({{ match.home_team_goals }} x {{ match.away_team_goals }}) {{ match.away_team_name }}</p>
+    {% endfor %}
+
+{% endfor %}
+
 {% endblock %}

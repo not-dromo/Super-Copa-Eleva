@@ -13,7 +13,7 @@ from cloudinary.utils import cloudinary_url
 
 load_dotenv()
 
-#TODO: add error message iff SQLALCHEMY_DATABASE_URL is not set in the environment variables
+#TODO: add error message if SQLALCHEMY_DATABASE_URL is not set in the environment variables
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -23,7 +23,7 @@ app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
 }
 app.config['TEMPLATES_AUTO_RELOAD'] = True
 
-# Configuration       
+# Configuration of Cloudinary       
 cloudinary.config( 
     cloud_name = "ccpmanza", 
     api_key = os.getenv("CLOUDINARY_API_KEY"),
@@ -33,7 +33,9 @@ cloudinary.config(
 
 db.init_app(app)
 
-#consultas de SQL
+#SQL queries:
+
+#SQL queries to get all players data
 def get_players_data():
     all_players_goals = db.session.query(Goal.player_id, func.count(Goal.id).label('goal_count')).filter(Goal.own_goal == False).group_by(Goal.player_id).subquery()
     all_players_assists = db.session.query(Assist.player_id, func.count(Assist.id).label('assist_count')).group_by(Assist.player_id).subquery()
@@ -48,6 +50,7 @@ def get_players_data():
 
     return (all_players_goals, all_players_assists, all_players_yellow_cards, all_players_red_cards, all_players_poma, all_players_pora, all_players_totr)
 
+#SQL queries to get a single player data
 def get_single_player_data(choosen_player):
     player_goals = db.session.query(func.count(Goal.id)).filter(Goal.player_id == choosen_player and Goal.own_goal == False).scalar()
     player_assists = db.session.query(func.count(Assist.id)).filter(Assist.player_id == choosen_player).scalar()
@@ -62,12 +65,8 @@ def get_single_player_data(choosen_player):
 
     return (player_goals, player_assists, player_yellow_cards, player_red_cards, player_poma, player_pora, player_totr)
 
-def get_players_from_a_team(choosen_team):
-    all_players = db.session.query(Player).filter(Player.team_id == choosen_team).order_by(Player.name).all()
-    number_of_players = len(all_players)
 
-    return (all_players, number_of_players)
-
+#SQL queries to get all teams data
 def get_teams_data():
     all_games_away = db.session.query(Match.away_team_id, func.count(Match.away_team_id).label('matches_away')).group_by(Match.away_team_id).subquery()
     all_games_home = db.session.query(Match.home_team_id, func.count(Match.home_team_id).label('matches_home')).group_by(Match.home_team_id).subquery()
@@ -82,8 +81,17 @@ def get_teams_data():
 
     return (all_games_away, all_games_home, all_wins_away, all_wins_home, all_losses_away, all_losses_home, all_team_goals_away, all_team_goals_home, all_team_goals_against_away, all_team_goals_against_home)
 
+#SQL queries to get all players from a single team
+def get_players_from_a_team(choosen_team):
+    all_players = db.session.query(Player).filter(Player.team_id == choosen_team).order_by(Player.name).all()
+    number_of_players = len(all_players)
+
+    return (all_players, number_of_players)
+
+
+#SQL queries to get all matches data
 def get_matches_data():
-    Home_team = aliased(Team)
+    Home_team = aliased(Team) #although there is no difference between Home and Away teams in this championship it's an important distinction to make so that the database is more readable
     Away_team = aliased(Team)
 
     results = db.session.query(Match, Home_team, Away_team)\
@@ -94,6 +102,7 @@ def get_matches_data():
 
     return results
 
+#Dictionary to map team IDs to badge image filenames - maybe change it to a database column in the future, but as of 2026 it works (small amount of teams)
 TEAM_BADGES = {
     0: 'No_Badge.png',
     1: 'Aposendaros_2019.png',
@@ -105,21 +114,31 @@ TEAM_BADGES = {
     7: 'UbiraNove_Family_2025.png',
 }
 
+#Default player photo in case the player doesn't have a photo uploaded to Cloudinary
 DEFAULT_PLAYER_PHOTO_WHITE = "https://res.cloudinary.com/ccpmanza/image/upload/no_player_photo_white_uy3xrm.png"
+
+
 
 #routes↓
 @app.route('/')
 def index():
-    #empty
+    #empty for now
     return render_template('index.html')
 
 @app.route('/main_menu')
 def main_menu():
     #empty
+    #TODO: add a main menu page with
+    # - next matches
+    # - last matches
+    # - player of the round (winner of pora)
+    # - team of the round (winners of totr)
+    ### that's it for now ###
+
     return render_template('main_menu.html')
 
 
-
+#Players page route - shows all players and their current stats
 @app.route('/players')
 def players():
     (all_players_goals, all_players_assists, all_players_yellow_cards, all_players_red_cards, all_players_poma, all_players_pora, all_players_totr) = get_players_data()
@@ -164,7 +183,9 @@ def players():
     return render_template('players.html', players=players_data)
 
 
-
+#Player stats page route - shows a single player's stats and trophies
+#TODO: add a history section of last (and all) matches played by this player 
+#--> TODO: add a table in the BD of which player played in which match
 @app.route('/player_stats/<int:player_id>')
 def player_stats(player_id):
     player = Player.query.get(player_id)
@@ -190,11 +211,14 @@ def player_stats(player_id):
         default_photo = DEFAULT_PLAYER_PHOTO_WHITE
     )
 
+#Teams page route - shows all teams so you can click on a team and see their page
 @app.route('/teams')
 def teams():
     #empty
     return render_template('teams.html')
 
+#Team page route - shows all players from that team
+#TODO: add a history section of last (and all) matches played by this team (just like the player stats page, but for teams)
 @app.route('/team_page/<int:team_id>')
 def team_page(team_id):
     team = Team.query.get(team_id)
@@ -217,6 +241,7 @@ def team_page(team_id):
         default_photo = DEFAULT_PLAYER_PHOTO_WHITE
         )
 
+#Standings page route - shows the current standings of the championship
 @app.route('/standings')
 def standings():
     (all_matches_away, all_matches_home, all_wins_away, all_wins_home, all_losses_away, all_losses_home, all_goals_away, all_goals_home, all_goals_against_away, all_goals_against_home) = get_teams_data()
@@ -272,6 +297,10 @@ def standings():
     
     return render_template('standings.html', teams=team_data)
 
+#Matches page route - shows all matches played in the championship and the next one to come
+#TODO: add a button for admins so that they can create the next matches and edit their results, who played, goals, assists, cards, etc...
+#TODO: add a feature so that when you click on a match it shows the match details --> make it a pop up page and not a new page
+#TODO: add to the pop up page the possibility to add links to the youtube videos of the goals and the instagram post related to that match
 @app.route('/matches')
 def matches():
     all_matches = get_matches_data()
@@ -324,12 +353,8 @@ def test_player_page():
         badge_file='No_Badge.png'
     )
 
-
-
-
-
-
 #TODO: quando terminar de codar tudo trocar de true para debug=False
+#--> translation: when you finish coding everything change from true to debug=False
 if __name__ == '__main__':
     # from livereload import Server
     # server = Server(app.wsgi_app)

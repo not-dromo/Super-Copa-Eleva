@@ -117,6 +117,22 @@ TEAM_BADGES = {
 #Default player photo in case the player doesn't have a photo uploaded to Cloudinary
 DEFAULT_PLAYER_PHOTO_WHITE = "https://res.cloudinary.com/ccpmanza/image/upload/no_player_photo_white_uy3xrm.png"
 
+#Dictonary to convert month numbers to month names in Portuguese
+MONTH_NAMES_PT = {
+    1: "Janeiro",    2: "Fevereiro",  3: "Março",
+    4: "Abril",      5: "Maio",       6: "Junho",
+    7: "Julho",      8: "Agosto",     9: "Setembro",
+    10: "Outubro",  11: "Novembro",  12: "Dezembro"
+}
+
+#function that formats a date to the format "day de month" in Portuguese --> (DD de MM)
+def format_date_pt(date):
+    if date is None:
+        return ""
+    #return f"{date.day} de {MONTH_NAMES_PT[date.month]} de {date.year}"
+    return f"{date.day} de {MONTH_NAMES_PT[date.month]}"
+app.jinja_env.filters['format_date_pt'] = format_date_pt
+
 
 
 #routes↓
@@ -317,9 +333,13 @@ def matches():
             "away_team_goals": match.away_team_goals,
             "home_team_badge": TEAM_BADGES.get(home_team.id, 'No_Badge.png'),
             "away_team_badge": TEAM_BADGES.get(away_team.id, 'No_Badge.png'),
+            "date": match.match_date,
+            "round_id": match.round_id,
         }
 
         matches_by_date.setdefault(match_day, []).append(match_data)
+
+    print(matches_by_date)
     
     return render_template('matches.html', matches_by_date=matches_by_date)
 

@@ -2,15 +2,29 @@
 
 {% block content %}
 
-<h1>EM CONSTRUÇÃO</h1>
-
-{% for date, matches_list in matches_by_date.items() %}
-    <h2>{{ date }}</h2>
-    
-    {% for match in matches_list %}
-        <p>{{ match.home_team_name }} ({{ match.home_team_goals }} x {{ match.away_team_goals }}) {{ match.away_team_name }}</p>
+<div class="all-matches">
+    {% for date, matches_list in matches_by_date.items() %}
+        <div class="all-matches-on-a-day">
+            <h2 class="round-and-date">Rodada {{ matches_list[0].round_id }} - {{ date | format_date_pt }}</h2>
+            <div class="matches-on-a-day">
+            {% for match in matches_list %}
+                <a class="match-card">
+                    <div class="home-team">
+                        <p class="home-team-name">{{ match.home_team_name }}</p>
+                        <img src="{{ url_for('static', filename='images/Team_badges/' ~ match.home_team_badge) }}" class="home-team-badge">
+                    </div>
+                    <div class="match-score">
+                        <p class="score">{{ match.home_team_goals }} - {{ match.away_team_goals }}</p>
+                    </div>
+                    <div class="away-team">
+                        <img src="{{ url_for('static', filename='images/Team_badges/' ~ match.away_team_badge) }}" class="away-team-badge">
+                        <p class="away-team-name">{{ match.away_team_name }}</p>
+                    </div>
+                </a>
+            {% endfor %}
+            </div>
+        </div>
     {% endfor %}
-
-{% endfor %}
+</div>
 
 {% endblock %}

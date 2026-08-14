@@ -594,6 +594,111 @@ tr:hover td {background-color: #032647;}
 
 
 
+/*Start of matches.html*/
+.all-matches {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin-top: 100px;
+}
+
+.all-matches-on-a-day{
+    border: 2px transparent red;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+    width: 1000px;
+    margin-bottom: 100px;
+}
+
+.round-and-date {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    width: 100%;
+    font-size: 40px;
+    margin-top: 25px;
+    margin: 0;
+}
+
+.matches-on-a-day {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}
+
+.match-card {
+    border: 2px transparent red;
+    margin-top: 10px;
+    border-radius: 25px;
+    background-color: #0f0f0f;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: flex-start;
+    width: 1000px;
+    height: 300px;
+}
+
+.home-team, .away-team {
+    border: 2px transparent red;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    width: 450px;
+    height: 200px;
+    margin-top: 50px;
+}
+
+.home-team {
+    justify-content: flex-end;
+}
+
+.away-team {
+    justify-content: flex-start;
+}
+
+.home-team-badge, .away-team-badge{
+    width: 160px;
+    height: auto;
+}
+
+.home-team-name, .away-team-name{
+    font-size: 20px;
+    font-weight: 600;
+}
+
+.match-score {
+    border: 2px transparent blue;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100px;
+    height: 200px;
+    margin-top: 50px;
+}
+
+.score {
+    font-size: 40px;
+    font-weight: 800;
+}
+/*End of matches.html*/
+
+
+
+
+
+
+
+
+
+
 /*idk where the fuck these are*/
 .team_name_and_badge {
     border: 8px solid #000000;

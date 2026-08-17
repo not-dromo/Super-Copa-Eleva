@@ -74,15 +74,15 @@ class Match(db.Model):
         db.UniqueConstraint('round_id', 'home_team_id', 'away_team_id', name='unique_match_per_round')
     )
 
-    class MatchAppearance(db.Model):
-        __tablename__ = "matches_played"
-        id = db.Column(db.Integer, primary_key=True)
-        match_id = db.Column(db.Integer, db.ForeignKey('matches.id'), nullable=False)
-        player_id = db.Column(db.Integer, db.ForeignKey('players.id'), nullable=False)
+class MatchAppearance(db.Model):
+    __tablename__ = "matches_played"
+    id = db.Column(db.Integer, primary_key=True)
+    match_id = db.Column(db.Integer, db.ForeignKey('matches.id'), nullable=False)
+    player_id = db.Column(db.Integer, db.ForeignKey('players.id'), nullable=False)
 
-        __table_args__ = (
-            db.UniqueConstraint('match_id', 'player_id', name='unique_player_per_match'),
-    )
+    __table_args__ = (
+        db.UniqueConstraint('match_id', 'player_id', name='unique_player_per_match'),
+)
 
 class Goal(db.Model):
     __tablename__ = "goals"

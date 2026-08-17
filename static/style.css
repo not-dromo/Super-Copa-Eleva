@@ -765,14 +765,27 @@ tr:hover td {background-color: #032647;}
     justify-content: flex-start;
     align-items: center;
     width: 250px;
-    height: 40px;
+    height: 80px;
     cursor: pointer;
 }
 
-.modal-player-photo{
-    width: 25px;
-    height: auto;
+.modal-player-photo-wrapper {
+    width: 35px;
+    height: 35px;
+    border-radius: 17.5px;
     overflow: hidden;
+    border: 2px solid #dddddd;
+    flex-shrink: 0;
+    margin-right: 5px;
+}
+
+.modal-player-photo {
+    width: 50px;
+    height: auto;
+    object-fit: cover;
+    object-position: top;
+    margin-left: -10.5px;
+    display: block;
 }
 
 .match-goals, .match-assists, .match-cards, .match-squad {
@@ -781,8 +794,22 @@ tr:hover td {background-color: #032647;}
 }
 
 .home-goals, .away-goals, .home-assists, .away-assists, .home-cards, .away-cards {
+    border: 2px solid red;
     display: flex;
-    direction: column;
+    flex-direction: column;
+    width: 250px;
+    height: auto;
+    margin-top: 0px;
+}
+
+.modal-goal, .modal-assist, .modal-cards{
+    border: 1px solid white;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    width: 200px;
+    height: 40px;
 }
 
 /*End of matches.html*/

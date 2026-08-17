@@ -109,7 +109,7 @@ function abrirModal(matchId) {
     let potmHtml = "<p>Nenhum jogador destaque definido</p>";
     if (data.player_of_the_match) {
         const potm = data.player_of_the_match;
-        potmHtml = `
+        potmHtml = /*html*/`
             <div class="potm">
                 <img src="${potm.photo}" class="potm-photo">
                 <p>⭐ Destaque: <strong>${potm.name}</strong> (${potm.nickname}) ${potm.is_captain ? "(C)" : ""}</p>
@@ -121,9 +121,11 @@ function abrirModal(matchId) {
     // Jogadores de cada time (recebe a lista já separada)
     function renderPlayers(players) {
         if (players.length === 0) return "<p>W.O.</p>";
-        return players.map(p => `
+        return players.map(p => /*html*/`
             <div class="modal-player">
-                <img src="${p.photo}" class="modal-player-photo">
+                <div class="modal-player-photo-wrapper">
+                    <img src="${p.photo}" class="modal-player-photo">
+                </div>
                 <p>${p.name} ${p.is_captain ? "(C)" : ""}</p>
                 <p>${p.nickname}</p>
                 ${p.round_selected ? "<span>⭐</span>" : ""}
@@ -136,8 +138,15 @@ function abrirModal(matchId) {
     const awayGoals = data.goals.filter(g => g.team_name === data.away_team_name);
 
     function renderGoals(goals) {
-        if (goals.length === 0) return "<p></p>";
-        return goals.map(g => `<p>⚽ ${g.player_name}${g.own_goal ? " (gc)" : ""}</p>`).join("");
+        if (goals.length === 0) return "";
+        return goals.map(g => /*html*/` 
+            <div class="modal-player">
+                <div class="modal-player-photo-wrapper">
+                    <img src="${g.photo}" class="modal-player-photo">
+                </div>
+                <div class="modal-goal">${g.player_name}${g.own_goal ? " (gc) " : ""} ⚽</div>
+            </div>
+        `).join("");
     }
 
     // Separa assistências por time
@@ -145,8 +154,10 @@ function abrirModal(matchId) {
     const awayAssists = data.assists.filter(a => a.team_name === data.away_team_name);
 
     function renderAssists(assists) {
-        if (assists.length === 0) return "<p></p>";
-        return assists.map(a => `<p>🅰️ ${a.player_name}</p>`).join("");
+        if (assists.length === 0) return "";
+        return assists.map(a => /*html*/`
+            <div class="modal-assist">🅰️ ${a.player_name}</div>
+        `).join("");
     }
 
     // Separa cartões por time
@@ -154,8 +165,8 @@ function abrirModal(matchId) {
     const awayCards = data.cards.filter(c => c.team_name === data.away_team_name);
 
     function renderCards(cards) {
-        if (cards.length === 0) return "<p></p>";
-        return cards.map(c => `<p>${c.card_type === "yellow" ? "🟨" : "🟥"} ${c.player_name}</p>`).join("");
+        if (cards.length === 0) return "";
+        return cards.map(c => `<div class="modal-cards">${c.card_type === "yellow" ? "🟨" : "🟥"} ${c.player_name}</div>`).join("");
     }
 
     document.getElementById('modalHeader').innerHTML = /*html*/`
@@ -180,18 +191,18 @@ function abrirModal(matchId) {
         <p>📍${data.location}</p>
 
         <div class="match-stats">
+            <h5>Gols</h5>
             <div class="match-goals">
-                <h5>Gols</h5>
                 <div class="home-goals">${renderGoals(homeGoals)}</div>
                 <div class="away-goals">${renderGoals(awayGoals)}</div>
             </div>
+            <h5>Assistências</h5>
             <div class="match-assists">
-                <h5>Assistências</h5>
                 <div class="home-assists">${renderAssists(homeAssists)}</div>
                 <div class="away-assists">${renderAssists(awayAssists)}</div>
             </div>
+            <h5>Cartões</h5>
             <div class="match-cards">
-                <h5>Cartões</h5>
                 <div class="home-cards">${renderCards(homeCards)}</div>
                 <div class="away-cards">${renderCards(awayCards)}</div>
             </div>

@@ -68,6 +68,39 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 });
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 function abrirModal(matchId) {
     const data = matchDetails[matchId];
     if (!data) return;
@@ -79,76 +112,143 @@ function abrirModal(matchId) {
         potmHtml = `
             <div class="potm">
                 <img src="${potm.photo}" class="potm-photo">
-                <p>${potm.name} ${potm.is_captain ? "(C)" : ""}</p>
-                <p>${potm.nickname}</p>
+                <p>⭐ Destaque: <strong>${potm.name}</strong> (${potm.nickname}) ${potm.is_captain ? "(C)" : ""}</p>
                 ${potm.was_round_player ? "<p>Também foi Jogador da Rodada</p>" : ""}
             </div>
         `;
     }
 
-    // Jogadores de cada time
+    // Jogadores de cada time (recebe a lista já separada)
     function renderPlayers(players) {
-        if (players.length === 0) return "<p>Nenhum jogador registrado</p>";
+        if (players.length === 0) return "<p>W.O.</p>";
         return players.map(p => `
             <div class="modal-player">
                 <img src="${p.photo}" class="modal-player-photo">
                 <p>${p.name} ${p.is_captain ? "(C)" : ""}</p>
                 <p>${p.nickname}</p>
-                ${p.round_selected ? "<span>⭐ Seleção da Rodada</span>" : ""}
+                ${p.round_selected ? "<span>⭐</span>" : ""}
             </div>
         `).join("");
     }
 
-    // Gols
-    let goalsHtml = "<p>Nenhum gol na partida</p>";
-    if (data.goals.length > 0) {
-        goalsHtml = data.goals.map(g => `
-            <p>⚽ ${g.player_name} (${g.team_name})${g.own_goal ? " - contra" : ""}</p>
-        `).join("");
+    // Separa gols por time, usando o nome do time como comparação
+    const homeGoals = data.goals.filter(g => g.team_name === data.home_team_name);
+    const awayGoals = data.goals.filter(g => g.team_name === data.away_team_name);
+
+    function renderGoals(goals) {
+        if (goals.length === 0) return "<p></p>";
+        return goals.map(g => `<p>⚽ ${g.player_name}${g.own_goal ? " (gc)" : ""}</p>`).join("");
     }
 
-    // Assistências
-    let assistsHtml = "<p>Nenhuma assistência na partida</p>";
-    if (data.assists.length > 0) {
-        assistsHtml = data.assists.map(a => `
-            <p>🅰️ ${a.player_name} (${a.team_name})</p>
-        `).join("");
+    // Separa assistências por time
+    const homeAssists = data.assists.filter(a => a.team_name === data.home_team_name);
+    const awayAssists = data.assists.filter(a => a.team_name === data.away_team_name);
+
+    function renderAssists(assists) {
+        if (assists.length === 0) return "<p></p>";
+        return assists.map(a => `<p>🅰️ ${a.player_name}</p>`).join("");
     }
 
-    // Cartões
-    let cardsHtml = "<p>Nenhum cartão na partida</p>";
-    if (data.cards.length > 0) {
-        cardsHtml = data.cards.map(c => `
-            <p>${c.card_type === "yellow" ? "🟨" : "🟥"} ${c.player_name} (${c.team_name})</p>
-        `).join("");
+    // Separa cartões por time
+    const homeCards = data.cards.filter(c => c.team_name === data.home_team_name);
+    const awayCards = data.cards.filter(c => c.team_name === data.away_team_name);
+
+    function renderCards(cards) {
+        if (cards.length === 0) return "<p></p>";
+        return cards.map(c => `<p>${c.card_type === "yellow" ? "🟨" : "🟥"} ${c.player_name}</p>`).join("");
     }
 
-    document.getElementById('modalBody').innerHTML = `
-        <h3>${data.home_team_name} ${data.home_team_goals} - ${data.away_team_goals} ${data.away_team_name}</h3>
+    document.getElementById('modalHeader').innerHTML = /*html*/`
+        <div class="match-card">
+            <div class="home-team">
+                <p class="home-team-name">${ data.home_team_name }</p>
+                <img src="/static/images/Team_badges/${data.home_team_badge}" class="home-team-badge">
+            </div>
+            <div class="match-score">
+                <p class="score">${ data.home_team_goals } - ${ data.away_team_goals }</p>
+            </div>
+            <div class="away-team">
+                <img src="/static/images/Team_badges/${data.away_team_badge}" class="away-team-badge">
+                <p class="away-team-name">${ data.away_team_name }</p>
+            </div>
+        </div>
+    `;
+
+
+    document.getElementById('modalBody').innerHTML = /*html*/`
         <p>${data.date} às ${data.time}</p>
-        <p>${data.location}</p>
+        <p>📍${data.location}</p>
 
-        <h4>Jogador Destaque</h4>
-        ${potmHtml}
+        <div class="match-stats">
+            <div class="match-goals">
+                <h5>Gols</h5>
+                <div class="home-goals">${renderGoals(homeGoals)}</div>
+                <div class="away-goals">${renderGoals(awayGoals)}</div>
+            </div>
+            <div class="match-assists">
+                <h5>Assistências</h5>
+                <div class="home-assists">${renderAssists(homeAssists)}</div>
+                <div class="away-assists">${renderAssists(awayAssists)}</div>
+            </div>
+            <div class="match-cards">
+                <h5>Cartões</h5>
+                <div class="home-cards">${renderCards(homeCards)}</div>
+                <div class="away-cards">${renderCards(awayCards)}</div>
+            </div>
+            <div class="match-squad">
+                <details>
+                    <summary>Elenco ${data.home_team_name}</summary>
+                    <div class="modal-team-players">${renderPlayers(data.home_players)}</div>
+                </details>
+                <details>
+                    <summary>Elenco ${data.away_team_name}</summary>
+                    <div class="modal-team-players">${renderPlayers(data.away_players)}</div>
+                </details>
+            </div>
+        </div>
 
-        <h4>${data.home_team_name}</h4>
-        <div class="modal-team-players">${renderPlayers(data.home_players)}</div>
-
-        <h4>${data.away_team_name}</h4>
-        <div class="modal-team-players">${renderPlayers(data.away_players)}</div>
-
-        <h4>Gols</h4>
-        ${goalsHtml}
-
-        <h4>Assistências</h4>
-        ${assistsHtml}
-
-        <h4>Cartões</h4>
-        ${cardsHtml}
+        <div class="player-of-the-match">${potmHtml}</div>
     `;
 
     document.getElementById('matchModal').style.display = "flex";
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 function fecharModal() {
     document.getElementById('matchModal').style.display = "none";

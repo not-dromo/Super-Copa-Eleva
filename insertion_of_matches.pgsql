@@ -1,0 +1,14 @@
+--Partida  1 inserida já
+--Partida  2 inserida já
+--Partida  3 inserida já
+--Partida  4 inserida já
+--Partida  5 inserida já
+--Partida  6 inserida já
+--Partida  7 inserida já
+--Partida  8 inserida já
+--Partida  9 inserida já
+--Partida 10 inserida já
+
+--Partida 11 e Partida 12 estão faltando sendo elas:
+-- Parinha 2 x 0 David A. Williams
+-- Selemanca 4 x 1 Inter de Milambe

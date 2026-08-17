@@ -9,6 +9,9 @@ import cloudinary
 import cloudinary.uploader
 from cloudinary.utils import cloudinary_url
 from zoneinfo import ZoneInfo
+from collections import defaultdict
+#for tests
+import time
 
 BRASILIA_TZ = ZoneInfo("America/Sao_Paulo")
 
@@ -324,7 +327,61 @@ def standings():
 #TODO: add to the pop up page the possibility to add links to the youtube videos of the goals and the instagram post related to that match
 @app.route('/matches')
 def matches():
+    #test start
+    start = time.time()
+    #test end
+
     all_matches = get_matches_data()
+    match_ids = [match.id for match, _, _, in all_matches]
+
+    #Searches everything at once out of the loop fore fast page loading
+    all_appearances = db.session.query(MatchAppearance, Player)\
+        .join(Player, MatchAppearance.player_id == Player.id)\
+        .filter(MatchAppearance.match_id.in_(match_ids))\
+        .all()
+
+    all_goals = db.session.query(Goal, Player)\
+        .join(Player, Goal.player_id == Player.id)\
+        .filter(Goal.match_id.in_(match_ids)).all()
+
+    all_assists = db.session.query(Assist, Player)\
+        .join(Player, Assist.player_id == Player.id)\
+        .filter(Assist.match_id.in_(match_ids)).all()
+
+    all_yellow_cards = db.session.query(YellowCard, Player)\
+        .join(Player, YellowCard.player_id == Player.id)\
+        .filter(YellowCard.match_id.in_(match_ids)).all()
+
+    all_red_cards = db.session.query(RedCard, Player)\
+        .join(Player, RedCard.player_id == Player.id)\
+        .filter(RedCard.match_id.in_(match_ids)).all()
+
+    round_ids = [match.round_id for match, _, _, in all_matches]
+    all_round_selections = db.session.query(TeamOfTheRound)\
+        .filter(TeamOfTheRound.round_id.in_(round_ids)).all()
+
+    #Organizes everything in a dictionary by match_id
+    appearances_by_match = defaultdict(list)
+    for appearance, player in all_appearances:
+        appearances_by_match[appearance.match_id].append(player)
+
+    goals_by_match = defaultdict(list)
+    for goal, player in all_goals:
+        goals_by_match[goal.match_id].append((goal, player))
+
+    assists_by_match = defaultdict(list)
+    for assist, player in all_assists:
+        assists_by_match[assist.match_id].append((assist, player))
+
+    cards_by_match = defaultdict(list)
+    for card, player in all_yellow_cards:
+        cards_by_match[card.match_id].append((player, "yellow"))
+    for card, player in all_red_cards:
+        cards_by_match[card.match_id].append((player, "red"))
+
+    round_selected_by_round = defaultdict(set)
+    for row in all_round_selections:
+        round_selected_by_round[row.round_id].add(row.player_id)
 
     #This is a dictionary that will hold the matches grouped by date. The key is the date and the value is a list of matches played on that date.
     matches_by_date = {}
@@ -359,34 +416,22 @@ def matches():
         player_of_the_match_data = None
         if match.player_of_the_match_id:
             player_of_the_match = Player.query.get(match.player_of_the_match_id)
-            was_round_player = db.session.query(Round).filter_by(
-                id = match.round_id, 
-                player_of_the_round_id = player_of_the_match.id
-            ).first() is not None
+            players_of_the_round = round_selected_by_round[match.round_id]
 
             player_of_the_match_data = {
                 "name": player_of_the_match.name,
                 "nickname": player_of_the_match.nickname if player_of_the_match.nickname else "",
                 "is_captain": player_of_the_match.captain,
                 "photo": player_of_the_match.photo_url if player_of_the_match.photo_url else DEFAULT_PLAYER_PHOTO_WHITE,
-                "was_round_player": was_round_player,
+                "was_round_player": player_of_the_match.id in players_of_the_round,
             }
 
-        #Players that played the match (in different teams)
-        appearances = db.session.query(MatchAppearance, Player)\
-            .join(Player, MatchAppearance.player_id == Player.id)\
-            .filter(MatchAppearance.match_id == match.id)\
-            .all()
-
         #Players selected for team of the round (if any)
-        round_selected_ids = {
-            row.player_id for row in
-            db.session.query(TeamOfTheRound).filter_by(round_id=match.round_id).all()
-        }
+        round_selected_ids = round_selected_by_round[match.round_id]
 
         home_players = []
         away_players = []
-        for appearance, player in appearances:
+        for player in appearances_by_match[match.id]:
             player_data = {
                 "name": player.name,
                 "nickname": player.nickname if player.nickname else "",
@@ -401,48 +446,22 @@ def matches():
 
 
         #Goals
-        goals = db.session.query(Goal, Player)\
-            .join(Player, Goal.player_id == Player.id)\
-            .filter(Goal.match_id == match.id)\
-            .all()
-
         goals_data = [
-            {
-                "player_name": player.name,
-                "team_name": player.team.name,
-                "own_goal": goal.own_goal,
-            }
-            for goal, player in goals
+            {"player_name": p.name, "team_name": p.team.name, "own_goal": g.own_goal}
+            for g, p in goals_by_match[match.id]
         ]
 
         #Assists
-        assists = db.session.query(Assist, Player)\
-            .join(Player, Assist.player_id == Player.id)\
-            .filter(Assist.match_id == match.id)\
-            .all()
-
         assists_data = [
-            {
-                "player_name": player.name,
-                "team_name": player.team.name,
-            }
-            for _, player in assists
+            {"player_name": p.name, "team_name": p.team.name}
+            for _, p in assists_by_match[match.id]
         ]
 
-        #Yellow and Red cards
-        yellow_cards = db.session.query(YellowCard, Player)\
-            .join(Player, YellowCard.player_id == Player.id)\
-            .filter(YellowCard.match_id == match.id)\
-            .all()
-        red_cards = db.session.query(RedCard, Player)\
-            .join(Player, RedCard.player_id == Player.id)\
-            .filter(RedCard.match_id == match.id)\
-            .all()
-
-        cards_data = (
-            [{"player_name": p.name, "team_name": p.team.name, "card_type": "yellow"} for _, p in yellow_cards]
-            + [{"player_name": p.name, "team_name": p.team.name, "card_type": "red"} for _, p in red_cards]   
-        )
+        #Cards
+        cards_data = [
+            {"player_name": p.name, "team_name": p.team.name, "card_type": t}
+            for p, t in cards_by_match[match.id]
+        ]
 
         #JSON file with all details of each match
         match_details[match.id] = {
@@ -463,9 +482,13 @@ def matches():
             "cards": cards_data,
         }
 
+    #test start
+    end = time.time()
+    print(f"Tempo de execução: {end - start:.3f} segundos")
+
+    #test end#
+
     return render_template('matches.html', matches_by_date=matches_by_date, match_details = match_details)
-
-
 
 
 

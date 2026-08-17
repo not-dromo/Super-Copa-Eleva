@@ -327,9 +327,9 @@ def standings():
 #TODO: add to the pop up page the possibility to add links to the youtube videos of the goals and the instagram post related to that match
 @app.route('/matches')
 def matches():
-    #test start
+    #load time test variable start
     start = time.time()
-    #test end
+    #load time test variable end
 
     all_matches = get_matches_data()
     match_ids = [match.id for match, _, _, in all_matches]
@@ -447,19 +447,33 @@ def matches():
 
         #Goals
         goals_data = [
-            {"player_name": p.name, "team_name": p.team.name, "own_goal": g.own_goal}
+            {
+                "player_name": p.name,
+                "team_name": p.team.name,
+                "own_goal": g.own_goal,
+                "photo": p.photo_url if p.photo_url else DEFAULT_PLAYER_PHOTO_WHITE,
+            }
             for g, p in goals_by_match[match.id]
         ]
 
         #Assists
         assists_data = [
-            {"player_name": p.name, "team_name": p.team.name}
+            {
+                "player_name": p.name,
+                "team_name": p.team.name,
+                "photo": p.photo_url if p.photo_url else DEFAULT_PLAYER_PHOTO_WHITE,
+            }
             for _, p in assists_by_match[match.id]
         ]
 
         #Cards
         cards_data = [
-            {"player_name": p.name, "team_name": p.team.name, "card_type": t}
+            {
+                "player_name": p.name,
+                "team_name": p.team.name,
+                "card_type": t,
+                "photo": p.photo_url if p.photo_url else DEFAULT_PLAYER_PHOTO_WHITE,
+            }
             for p, t in cards_by_match[match.id]
         ]
 
@@ -482,11 +496,10 @@ def matches():
             "cards": cards_data,
         }
 
-    #test start
+    #load time check start
     end = time.time()
     print(f"Tempo de execução: {end - start:.3f} segundos")
-
-    #test end#
+    #load time check end
 
     return render_template('matches.html', matches_by_date=matches_by_date, match_details = match_details)
 

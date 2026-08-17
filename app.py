@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, redirect, abort
-from models import db, Player, Team, Championship, Standing, Round, Match, Goal, Assist, YellowCard, RedCard, TeamOfTheRound, ChampionshipTitle
+from models import db, Player, Team, Championship, Standing, Round, Match, MatchAppearance, Goal, Assist, YellowCard, RedCard, TeamOfTheRound, ChampionshipTitle
 from sqlalchemy import func
 from sqlalchemy.orm import aliased
 import models
@@ -8,6 +8,9 @@ from dotenv import load_dotenv
 import cloudinary
 import cloudinary.uploader
 from cloudinary.utils import cloudinary_url
+from zoneinfo import ZoneInfo
+
+BRASILIA_TZ = ZoneInfo("America/Sao_Paulo")
 
 #TODO: QUANDO TERMINAR DE CODAR TUUDO TEM QUE IR ATÉ O FINAL DESSA PAGINA E TROCAR O DEBUG PRA FALSE!!!!!
 
@@ -195,6 +198,9 @@ def players():
         }
         for p, goals, assists, yellow_cards, red_cards, player_of_the_match, player_of_the_round, team_of_the_rounds in results
     ]
+
+    for p in players_data:
+        print("id: " + str(p["id"]) + " - name: " + str(p["name"]) + "\n")
     
     return render_template('players.html', players=players_data)
 
@@ -315,13 +321,16 @@ def standings():
 
 #Matches page route - shows all matches played in the championship and the next one to come
 #TODO: add a button for admins so that they can create the next matches and edit their results, who played, goals, assists, cards, etc...
-#TODO: add a feature so that when you click on a match it shows the match details --> make it a pop up page and not a new page
 #TODO: add to the pop up page the possibility to add links to the youtube videos of the goals and the instagram post related to that match
 @app.route('/matches')
 def matches():
     all_matches = get_matches_data()
 
+    #This is a dictionary that will hold the matches grouped by date. The key is the date and the value is a list of matches played on that date.
     matches_by_date = {}
+    #This, on the other hand, is a JSON file that contains all the matches details so that the HTML page can display all of it in the pop up page when you click on a match. The key is the match ID and the value is a dictionary with all the match details.
+    match_details = {}
+
     for match, home_team, away_team in all_matches:
         match_day = match.match_date.date() if match.match_date else None
 
@@ -339,9 +348,122 @@ def matches():
 
         matches_by_date.setdefault(match_day, []).append(match_data)
 
-    print(matches_by_date)
-    
-    return render_template('matches.html', matches_by_date=matches_by_date)
+        #Details for the pop up page
+        if match.match_date:
+            local_dt = match.match_date.astimezone(BRASILIA_TZ)
+            match_time_str = local_dt.strftime("%H:%M")
+        else:
+            match_time_str = "Horário não definido"
+
+        #Player of the match: winner of poma (player of the match award)
+        player_of_the_match_data = None
+        if match.player_of_the_match_id:
+            player_of_the_match = Player.query.get(match.player_of_the_match_id)
+            was_round_player = db.session.query(Round).filter_by(
+                id = match.round_id, 
+                player_of_the_round_id = player_of_the_match.id
+            ).first() is not None
+
+            player_of_the_match_data = {
+                "name": player_of_the_match.name,
+                "nickname": player_of_the_match.nickname if player_of_the_match.nickname else "",
+                "is_captain": player_of_the_match.captain,
+                "photo": player_of_the_match.photo_url if player_of_the_match.photo_url else DEFAULT_PLAYER_PHOTO_WHITE,
+                "was_round_player": was_round_player,
+            }
+
+        #Players that played the match (in different teams)
+        appearances = db.session.query(MatchAppearance, Player)\
+            .join(Player, MatchAppearance.player_id == Player.id)\
+            .filter(MatchAppearance.match_id == match.id)\
+            .all()
+
+        #Players selected for team of the round (if any)
+        round_selected_ids = {
+            row.player_id for row in
+            db.session.query(TeamOfTheRound).filter_by(round_id=match.round_id).all()
+        }
+
+        home_players = []
+        away_players = []
+        for appearance, player in appearances:
+            player_data = {
+                "name": player.name,
+                "nickname": player.nickname if player.nickname else "",
+                "is_captain": player.captain,
+                "photo": player.photo_url if player.photo_url else DEFAULT_PLAYER_PHOTO_WHITE,
+                "round_selected": player.id in round_selected_ids,
+            }
+            if player.team_id == match.home_team_id:
+                home_players.append(player_data)
+            elif player.team_id == match.away_team_id:
+                away_players.append(player_data)
+
+
+        #Goals
+        goals = db.session.query(Goal, Player)\
+            .join(Player, Goal.player_id == Player.id)\
+            .filter(Goal.match_id == match.id)\
+            .all()
+
+        goals_data = [
+            {
+                "player_name": player.name,
+                "team_name": player.team.name,
+                "own_goal": goal.own_goal,
+            }
+            for goal, player in goals
+        ]
+
+        #Assists
+        assists = db.session.query(Assist, Player)\
+            .join(Player, Assist.player_id == Player.id)\
+            .filter(Assist.match_id == match.id)\
+            .all()
+
+        assists_data = [
+            {
+                "player_name": player.name,
+                "team_name": player.team.name,
+            }
+            for _, player in assists
+        ]
+
+        #Yellow and Red cards
+        yellow_cards = db.session.query(YellowCard, Player)\
+            .join(Player, YellowCard.player_id == Player.id)\
+            .filter(YellowCard.match_id == match.id)\
+            .all()
+        red_cards = db.session.query(RedCard, Player)\
+            .join(Player, RedCard.player_id == Player.id)\
+            .filter(RedCard.match_id == match.id)\
+            .all()
+
+        cards_data = (
+            [{"player_name": p.name, "team_name": p.team.name, "card_type": "yellow"} for _, p in yellow_cards]
+            + [{"player_name": p.name, "team_name": p.team.name, "card_type": "red"} for _, p in red_cards]   
+        )
+
+        #JSON file with all details of each match
+        match_details[match.id] = {
+            "home_team_name": home_team.name,
+            "away_team_name": away_team.name,
+            "home_team_badge": TEAM_BADGES.get(home_team.id, 'No_Badge.png'),
+            "away_team_badge": TEAM_BADGES.get(away_team.id, 'No_Badge.png'),
+            "home_team_goals": match.home_team_goals,
+            "away_team_goals": match.away_team_goals,
+            "date": format_date_pt(match.match_date) if match.match_date else "Data não definida",
+            "time": match_time_str,
+            "location": match.location if match.location else "Local não definido",
+            "player_of_the_match": player_of_the_match_data,
+            "home_players": home_players,
+            "away_players": away_players,
+            "goals": goals_data,
+            "assists": assists_data,
+            "cards": cards_data,
+        }
+
+    return render_template('matches.html', matches_by_date=matches_by_date, match_details = match_details)
 
 
 

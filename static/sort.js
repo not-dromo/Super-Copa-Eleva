@@ -110,9 +110,10 @@ function abrirModal(matchId) {
     if (data.player_of_the_match) {
         const potm = data.player_of_the_match;
         potmHtml = /*html*/`
-            <div class="potm">
+            <div class="modal-potm">
                 <img src="${potm.photo}" class="potm-photo">
-                <p>⭐ Destaque: <strong>${potm.name}</strong> (${potm.nickname}) ${potm.is_captain ? "(C)" : ""}</p>
+                <p>⭐ Destaque: <strong>${potm.name}</strong> ${potm.is_captain ? "(C)" : ""}</p>
+                <p>${potm.nickname}</p>
                 ${potm.was_round_player ? "<p>Também foi Jogador da Rodada</p>" : ""}
             </div>
         `;
@@ -123,11 +124,8 @@ function abrirModal(matchId) {
         if (players.length === 0) return "<p>W.O.</p>";
         return players.map(p => /*html*/`
             <div class="modal-player">
-                <div class="modal-player-photo-wrapper">
-                    <img src="${p.photo}" class="modal-player-photo">
-                </div>
-                <p>${p.name} ${p.is_captain ? "(C)" : ""}</p>
-                <p>${p.nickname}</p>
+                <img src="${p.photo}" class="modal-player-photo-squad">
+                <p class="modal-squad-player-name">${p.nickname ? p.nickname : p.name} ${p.is_captain ? "(C)" : ""}</p>
                 ${p.round_selected ? "<span>⭐</span>" : ""}
             </div>
         `).join("");
@@ -142,7 +140,7 @@ function abrirModal(matchId) {
         return goals.map(g => /*html*/` 
             <div class="modal-player">
                 <div class="modal-player-photo-wrapper">
-                    <img src="${g.photo}" class="modal-player-photo">
+                    <img src="${g.photo}" class="modal-player-photo-goal">
                 </div>
                 <div class="modal-goal">${g.player_name}${g.own_goal ? " (gc) " : ""} ⚽</div>
             </div>
@@ -156,7 +154,12 @@ function abrirModal(matchId) {
     function renderAssists(assists) {
         if (assists.length === 0) return "";
         return assists.map(a => /*html*/`
-            <div class="modal-assist">🅰️ ${a.player_name}</div>
+            <div class="modal-player">
+                <div class="modal-player-photo-wrapper">
+                    <img src="${a.photo}" class="modal-player-photo-assist">
+                </div>
+                <div class="modal-assist">🅰️ ${a.player_name}</div>
+            </div>
         `).join("");
     }
 
@@ -166,62 +169,80 @@ function abrirModal(matchId) {
 
     function renderCards(cards) {
         if (cards.length === 0) return "";
-        return cards.map(c => `<div class="modal-cards">${c.card_type === "yellow" ? "🟨" : "🟥"} ${c.player_name}</div>`).join("");
+        return cards.map(c => /*html*/`
+            <div class="modal-player">
+                <div class="modal-player-photo-wrapper">
+                    <img src="${c.photo}" class="modal-player-photo-card">
+                </div>
+                <div class="modal-cards">${c.card_type === "yellow" ? "🟨" : "🟥"} ${c.player_name}</div>
+            </div>
+        `).join("");
     }
 
     document.getElementById('modalHeader').innerHTML = /*html*/`
-        <div class="match-card">
-            <div class="home-team">
-                <p class="home-team-name">${ data.home_team_name }</p>
-                <img src="/static/images/Team_badges/${data.home_team_badge}" class="home-team-badge">
+        <div class="modal-header">
+            <div class="modal-match-card">
+                <div class="home-team">
+                    <p class="home-team-name">${ data.home_team_name }</p>
+                    <img src="/static/images/Team_badges/${data.home_team_badge}" class="home-team-badge">
+                </div>
+                <div class="match-score">
+                    <p class="score">${ data.home_team_goals } - ${ data.away_team_goals }</p>
+                </div>
+                <div class="away-team">
+                    <img src="/static/images/Team_badges/${data.away_team_badge}" class="away-team-badge">
+                    <p class="away-team-name">${ data.away_team_name }</p>
+                </div>
             </div>
-            <div class="match-score">
-                <p class="score">${ data.home_team_goals } - ${ data.away_team_goals }</p>
-            </div>
-            <div class="away-team">
-                <img src="/static/images/Team_badges/${data.away_team_badge}" class="away-team-badge">
-                <p class="away-team-name">${ data.away_team_name }</p>
+            <div class="date-location-modal">
+                <p class="date-modal">${data.date} às ${data.time}</p>
+                <p class="location-modal">📍${data.location}</p>
             </div>
         </div>
     `;
 
 
     document.getElementById('modalBody').innerHTML = /*html*/`
-        <p>${data.date} às ${data.time}</p>
-        <p>📍${data.location}</p>
+        
+        <div class="modal-stats">
 
-        <div class="match-stats">
-            <h5>Gols</h5>
-            <div class="match-goals">
-                <div class="home-goals">${renderGoals(homeGoals)}</div>
-                <div class="away-goals">${renderGoals(awayGoals)}</div>
+            <div class="match-stats">
+                <h2>Gols</h2>
+                <div class="modal-match-goals">
+                    <div class="home-goals">${renderGoals(homeGoals)}</div>
+                    <div class="away-goals">${renderGoals(awayGoals)}</div>
+                </div>
+                <hr class="modal-divider">
+                <h2>Assistências</h2>
+                <div class="modal-match-assists">
+                    <div class="home-assists">${renderAssists(homeAssists)}</div>
+                    <div class="away-assists">${renderAssists(awayAssists)}</div>
+                </div>
+                <hr class="modal-divider">
+                <h2>Cartões</h2>
+                <div class="modal-match-cards">
+                    <div class="home-cards">${renderCards(homeCards)}</div>
+                    <div class="away-cards">${renderCards(awayCards)}</div>
+                </div>
+                <hr class="modal-divider">
+                <div class="modal-match-squad">
+                    <details class="modal-elenco">
+                        <summary>Elenco ${data.home_team_name}</summary>
+                        <div class="modal-team-players">${renderPlayers(data.home_players)}</div>
+                    </details>
+                    <details class="modal-elenco">
+                        <summary>Elenco ${data.away_team_name}</summary>
+                        <div class="modal-team-players">${renderPlayers(data.away_players)}</div>
+                    </details>
+                </div>
             </div>
-            <h5>Assistências</h5>
-            <div class="match-assists">
-                <div class="home-assists">${renderAssists(homeAssists)}</div>
-                <div class="away-assists">${renderAssists(awayAssists)}</div>
-            </div>
-            <h5>Cartões</h5>
-            <div class="match-cards">
-                <div class="home-cards">${renderCards(homeCards)}</div>
-                <div class="away-cards">${renderCards(awayCards)}</div>
-            </div>
-            <div class="match-squad">
-                <details>
-                    <summary>Elenco ${data.home_team_name}</summary>
-                    <div class="modal-team-players">${renderPlayers(data.home_players)}</div>
-                </details>
-                <details>
-                    <summary>Elenco ${data.away_team_name}</summary>
-                    <div class="modal-team-players">${renderPlayers(data.away_players)}</div>
-                </details>
-            </div>
+
+            <div class="player-of-the-match">${potmHtml}</div>
         </div>
-
-        <div class="player-of-the-match">${potmHtml}</div>
     `;
 
     document.getElementById('matchModal').style.display = "flex";
+    document.body.style.overflow = "hidden";
 }
 
 
@@ -263,6 +284,7 @@ function abrirModal(matchId) {
 
 function fecharModal() {
     document.getElementById('matchModal').style.display = "none";
+    document.body.style.overflow = "";
 }
 
 function fecharModalFora(event) {

@@ -736,16 +736,64 @@ tr:hover td {background-color: #032647;}
     overflow: hidden; /* garante que nada vaze do modal */
 }
 
+.modal-header {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-match-card {
+    margin-top: 10px;
+    background-color: #0f0f0f;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    width: 1000px;
+    height: 150px;
+}
+
+.date-location-modal {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin: 0;
+    margin-top: -30px;
+}
+
+.date-modal, .location-modal {
+    margin: 0;
+    margin-top: 0px;
+}
+
+.location-modal {
+    margin-left: -8px;
+}
+
 .modal-divider {
     border: none;
     border-top: 1px solid #333;
     margin: 10px 0;
 }
 
+.modal-stats {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+}
+
 .modal-scrollable {
     flex: 1;
     overflow-y: auto;
-    padding-right: 10px; /* evita que a barra de scroll cole no texto */
+    padding-right: 10px;
+    overscroll-behavior: contain;
+    scrollbar-width: none;
+}
+
+.modal-scrollable::-webkit-scrollbar {
+    display: none;
 }
 
 .modal-two-columns {
@@ -756,7 +804,6 @@ tr:hover td {background-color: #032647;}
 }
 
 .modal-player{
-    border: 2px solid red;
     margin-top: 10px;
     border-radius: 7px;
     background-color: #202020;
@@ -764,52 +811,85 @@ tr:hover td {background-color: #032647;}
     flex-direction: row;
     justify-content: flex-start;
     align-items: center;
-    width: 250px;
+    width: 300px;
     height: 80px;
     cursor: pointer;
 }
 
-.modal-player-photo-wrapper {
-    width: 35px;
-    height: 35px;
-    border-radius: 17.5px;
-    overflow: hidden;
-    border: 2px solid #dddddd;
-    flex-shrink: 0;
-    margin-right: 5px;
-}
-
-.modal-player-photo {
+.modal-player-photo-squad {
     width: 50px;
     height: auto;
     object-fit: cover;
     object-position: top;
-    margin-left: -10.5px;
     display: block;
+    margin-left: 10px;
 }
 
-.match-goals, .match-assists, .match-cards, .match-squad {
+.modal-player-photo-wrapper {
+    width: 50px;
+    height: 50px;
+    border-radius: 25px;
+    overflow: hidden;
+    border: 1.5px solid #dddddd;
+    flex-shrink: 0;
+    margin-right: 15px;
+    margin-left: 15px;
+}
+
+.modal-player-photo-goal, .modal-player-photo-assist, .modal-player-photo-card {
+    width: 100px;
+    height: auto;
+    object-fit: cover;
+    object-position: top;
+    margin-left: -22px;
+    display: block;
+} 
+
+.modal-match-goals, .modal-match-assists, .modal-match-cards, .modal-match-squad {
     display: flex;
     flex-direction: row;
 }
 
 .home-goals, .away-goals, .home-assists, .away-assists, .home-cards, .away-cards {
-    border: 2px solid red;
     display: flex;
     flex-direction: column;
-    width: 250px;
+    width: 350px;
     height: auto;
     margin-top: 0px;
 }
 
 .modal-goal, .modal-assist, .modal-cards{
-    border: 1px solid white;
     display: flex;
     flex-direction: row;
     justify-content: flex-start;
     align-items: center;
     width: 200px;
     height: 40px;
+}
+
+.modal-match-squad {
+    display: flex;
+    flex-direction: row;
+    gap: 50px;
+    width: 650px;
+    height: 50px;
+    margin-bottom: 50px;
+}
+
+.modal-elenco {
+    display: block;
+    width: 300px;
+    margin: 0 auto;
+}
+
+.modal-elenco summary {
+    font-size: 24px;
+    text-align: flex-start;
+    cursor: pointer;
+}
+
+.modal-squad-player-name {
+    margin-left: 10px;
 }
 
 /*End of matches.html*/

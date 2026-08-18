@@ -600,6 +600,11 @@ tr:hover td { background-color: var(--color-table-hover); }
     cursor: pointer;
 }
 
+.match-card:hover {
+    background-color: var(--color-box-hover);
+    border: 2px solid var(--color-accent);
+}
+
 .home-team, .away-team {
     display: flex;
     flex-direction: row;

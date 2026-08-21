@@ -112,9 +112,9 @@ function abrirModal(matchId) {
         potmHtml = /*html*/`
             <div class="modal-potm">
                 <img src="${potm.photo}" class="potm-photo">
-                <p>⭐ Destaque: <strong>${potm.name}</strong> ${potm.is_captain ? "(C)" : ""}</p>
-                <p>${potm.nickname}</p>
-                ${potm.was_round_player ? "<p>Também foi Jogador da Rodada</p>" : ""}
+                <hr class="modal-divider">
+                <p class="potm-name">⭐ Destaque: <strong>${potm.nickname ? potm.nickname : potm.name}</strong> ${potm.is_captain ? "(C)" : ""}</p>
+                <p>${potm.was_round_player ? "<p>Também foi Jogador da Rodada</p>" : ""}</p>
             </div>
         `;
     }
@@ -201,30 +201,48 @@ function abrirModal(matchId) {
         </div>
     `;
 
+    const noGoals = (homeGoals.length === 0 && awayGoals.length === 0);
+    const goalsHtml = noGoals ? '' : `
+        <h2>Gols</h2>
+        <div class="modal-match-goals">
+            <div class="home-goals">${renderGoals(homeGoals)}</div>
+            <div class="away-goals">${renderGoals(awayGoals)}</div>
+        </div>
+        <hr class="modal-divider">
+    `;
+
+    const noAssists = (homeAssists.length === 0 && awayAssists.length === 0);
+    const assistsHtml = noAssists ? '' : `
+        <h2>Assistências</h2>
+        <div class="modal-match-assists">
+            <div class="home-assists">${renderAssists(homeAssists)}</div>
+            <div class="away-assists">${renderAssists(awayAssists)}</div>
+        </div>
+        <hr class="modal-divider">
+    `;
+
+    const nocards = (homeCards.length === 0 && awayCards.length === 0);
+    const cardsHtml = nocards ? '' : `
+        <h2>Cartões</h2>
+        <div class="modal-match-cards">
+            <div class="home-cards">${renderCards(homeCards)}</div>
+            <div class="away-cards">${renderCards(awayCards)}</div>
+        </div>
+        <hr class="modal-divider">
+    `;
+
+    console.log(JSON.stringify(homeAssists));
+    console.log(JSON.stringify(awayAssists));
+
 
     document.getElementById('modalBody').innerHTML = /*html*/`
         
         <div class="modal-stats">
 
             <div class="match-stats">
-                <h2>Gols</h2>
-                <div class="modal-match-goals">
-                    <div class="home-goals">${renderGoals(homeGoals)}</div>
-                    <div class="away-goals">${renderGoals(awayGoals)}</div>
-                </div>
-                <hr class="modal-divider">
-                <h2>Assistências</h2>
-                <div class="modal-match-assists">
-                    <div class="home-assists">${renderAssists(homeAssists)}</div>
-                    <div class="away-assists">${renderAssists(awayAssists)}</div>
-                </div>
-                <hr class="modal-divider">
-                <h2>Cartões</h2>
-                <div class="modal-match-cards">
-                    <div class="home-cards">${renderCards(homeCards)}</div>
-                    <div class="away-cards">${renderCards(awayCards)}</div>
-                </div>
-                <hr class="modal-divider">
+                ${goalsHtml}
+                ${assistsHtml}
+                ${cardsHtml}
                 <div class="modal-match-squad">
                     <details class="modal-elenco">
                         <summary>Elenco ${data.home_team_name}</summary>
@@ -237,7 +255,10 @@ function abrirModal(matchId) {
                 </div>
             </div>
 
-            <div class="player-of-the-match">${potmHtml}</div>
+            <div class="player-of-the-match-box">
+                <div class="player-of-the-match">${potmHtml}</div>
+            </div>
+
         </div>
     `;
 

@@ -602,7 +602,7 @@ tr:hover td { background-color: var(--color-table-hover); }
     justify-content: center;
     align-items: center;
     width: 1000px;
-    height: 250px;
+    height: 150px;
     cursor: pointer;
 }
 
@@ -628,12 +628,12 @@ tr:hover td { background-color: var(--color-table-hover); }
 }
 
 .home-team-badge, .away-team-badge {
-    width: 160px;
+    width: 140px;
     height: auto;
 }
 
 .home-team-name, .away-team-name {
-    font-size: 20px;
+    font-size: 30px;
     font-weight: 600;
 }
 
@@ -728,6 +728,7 @@ tr:hover td { background-color: var(--color-table-hover); }
     display: flex;
     flex-direction: row;
     justify-content: center;
+    gap: 100px;
 }
 
 .modal-scrollable {
@@ -836,6 +837,43 @@ tr:hover td { background-color: var(--color-table-hover); }
 
 .modal-squad-player-name {
     margin-left: 10px;
+}
+
+.player-of-the-match-box {
+    border: 2px transparent red;
+    background-color: var(--color-box-hover);
+    border-radius: 25px;   
+    height: 480px;
+    width: 320px;
+    margin-top: 50px;
+    margin-left: 0px;
+}
+
+.modal-potm {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.potm-photo {
+    width: 300px;
+    height: auto;
+    mask-image: linear-gradient(
+        rgba(16,16,16,1) 0%,
+        rgba(16,16,16,1) 70%,
+        rgba(16,16,16,0) 90%,
+        rgba(16,16,16,0) 100%
+    );
+}
+
+.potm-name {
+    margin-top: -40px;
+}
+
+.player-of-the-match {
+    margin: 0px;
+    margin-top: 20px;
 }
 /*End of matches.html*/
 

@@ -10,16 +10,16 @@ import cloudinary.uploader
 from cloudinary.utils import cloudinary_url
 from zoneinfo import ZoneInfo
 from collections import defaultdict
-#for tests
+# for tests
 import time
 
 BRASILIA_TZ = ZoneInfo("America/Sao_Paulo")
 
-#TODO: QUANDO TERMINAR DE CODAR TUUDO TEM QUE IR ATÉ O FINAL DESSA PAGINA E TROCAR O DEBUG PRA FALSE!!!!!
+# TODO: QUANDO TERMINAR DE CODAR TUUDO TEM QUE IR ATÉ O FINAL DESSA PAGINA E TROCAR O DEBUG PRA FALSE!!!!!
 
 load_dotenv()
 
-#TODO: add error message if SQLALCHEMY_DATABASE_URL is not set in the environment variables
+# TODO: add error message if SQLALCHEMY_DATABASE_URL is not set in the environment variables
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -39,9 +39,9 @@ cloudinary.config(
 
 db.init_app(app)
 
-#SQL queries:
+# SQL queries:
 
-#SQL queries to get all players data
+# SQL queries to get all players data
 def get_players_data():
     all_players_goals = db.session.query(Goal.player_id, func.count(Goal.id).label('goal_count')).filter(Goal.own_goal == False).group_by(Goal.player_id).subquery()
     all_players_assists = db.session.query(Assist.player_id, func.count(Assist.id).label('assist_count')).group_by(Assist.player_id).subquery()
@@ -56,7 +56,7 @@ def get_players_data():
 
     return (all_players_goals, all_players_assists, all_players_yellow_cards, all_players_red_cards, all_players_poma, all_players_pora, all_players_totr)
 
-#SQL queries to get a single player data
+# SQL queries to get a single player data
 def get_single_player_data(choosen_player):
     player_goals = db.session.query(func.count(Goal.id)).filter(Goal.player_id == choosen_player and Goal.own_goal == False).scalar()
     player_assists = db.session.query(func.count(Assist.id)).filter(Assist.player_id == choosen_player).scalar()
@@ -72,7 +72,7 @@ def get_single_player_data(choosen_player):
     return (player_goals, player_assists, player_yellow_cards, player_red_cards, player_poma, player_pora, player_totr)
 
 
-#SQL queries to get all teams data
+# SQL queries to get all teams data
 def get_teams_data():
     all_games_away = db.session.query(Match.away_team_id, func.count(Match.away_team_id).label('matches_away')).group_by(Match.away_team_id).subquery()
     all_games_home = db.session.query(Match.home_team_id, func.count(Match.home_team_id).label('matches_home')).group_by(Match.home_team_id).subquery()
@@ -87,7 +87,7 @@ def get_teams_data():
 
     return (all_games_away, all_games_home, all_wins_away, all_wins_home, all_losses_away, all_losses_home, all_team_goals_away, all_team_goals_home, all_team_goals_against_away, all_team_goals_against_home)
 
-#SQL queries to get all players from a single team
+# SQL queries to get all players from a single team
 def get_players_from_a_team(choosen_team):
     all_players = db.session.query(Player).filter(Player.team_id == choosen_team).order_by(Player.name).all()
     number_of_players = len(all_players)
@@ -95,9 +95,16 @@ def get_players_from_a_team(choosen_team):
     return (all_players, number_of_players)
 
 
-#SQL queries to get all matches data
+# Creates a list of tuples with 3 objects: match, home_team and away_team. The list is ordered by the date of the match
 def get_matches_data():
-    Home_team = aliased(Team) #although there is no difference between Home and Away teams in this championship it's an important distinction to make so that the database is more readable
+
+    # As of now (2026) Super Copa Eleva does not have the distinction 
+    # of Home and Away teams in the official rules, this is purely done in 
+    # the code so that we don't need to use team1 and team2 as nicknames.
+    # Home_team and Away_team have the same structure so it's important 
+    # to name them so that teams can be differentiated in a match
+
+    Home_team = aliased(Team) # creates a alias of the table Team
     Away_team = aliased(Team)
 
     results = db.session.query(Match, Home_team, Away_team)\
@@ -108,7 +115,7 @@ def get_matches_data():
 
     return results
 
-#Dictionary to map team IDs to badge image filenames - maybe change it to a database column in the future, but as of 2026 it works (small amount of teams)
+# Dictionary to map team IDs to badge image filenames - maybe change it to a database column in the future, but as of 2026 it works (small amount of teams)
 TEAM_BADGES = {
     0: 'No_Badge.png',
     1: 'Aposendaros_2019.png',
@@ -120,10 +127,10 @@ TEAM_BADGES = {
     7: 'UbiraNove_Family_2025.png',
 }
 
-#Default player photo in case the player doesn't have a photo uploaded to Cloudinary
+# Default player photo in case the player doesn't have a photo uploaded to Cloudinary
 DEFAULT_PLAYER_PHOTO_WHITE = "https://res.cloudinary.com/ccpmanza/image/upload/no_player_photo_white_uy3xrm.png"
 
-#Dictonary to convert month numbers to month names in Portuguese
+# Dictonary to convert month numbers to month names in Portuguese
 MONTH_NAMES_PT = {
     1: "Janeiro",    2: "Fevereiro",  3: "Março",
     4: "Abril",      5: "Maio",       6: "Junho",
@@ -131,36 +138,44 @@ MONTH_NAMES_PT = {
     10: "Outubro",  11: "Novembro",  12: "Dezembro"
 }
 
-#function that formats a date to the format "day de month" in Portuguese --> (DD de MM)
+# function that formats a date to the format "day de month" in Portuguese --> (DD de MM)
 def format_date_pt(date):
     if date is None:
         return ""
-    #return f"{date.day} de {MONTH_NAMES_PT[date.month]} de {date.year}"
+    # return f"{date.day} de {MONTH_NAMES_PT[date.month]} de {date.year}"
     return f"{date.day} de {MONTH_NAMES_PT[date.month]}"
 app.jinja_env.filters['format_date_pt'] = format_date_pt
 
 
 
-#routes↓
+
+
+
+
+
+
+
+# ROUTES↓
 @app.route('/')
 def index():
-    #empty for now
+    # empty for now
     return render_template('index.html')
 
 @app.route('/main_menu')
 def main_menu():
-    #empty
-    #TODO: add a main menu page with
+    # empty
+    # TODO: add a main menu page with
     # - next matches
     # - last matches
     # - player of the round (winner of pora)
     # - team of the round (winners of totr)
-    ### that's it for now ###
+    # - best players on each stat
+    # # # that's it for now # # # 
 
     return render_template('main_menu.html')
 
 
-#Players page route - shows all players and their current stats
+# Players page route - shows all players and their current stats
 @app.route('/players')
 def players():
     (all_players_goals, all_players_assists, all_players_yellow_cards, all_players_red_cards, all_players_poma, all_players_pora, all_players_totr) = get_players_data()
@@ -208,9 +223,9 @@ def players():
     return render_template('players.html', players=players_data)
 
 
-#Player stats page route - shows a single player's stats and trophies
-#TODO: add a history section of last (and all) matches played by this player 
-#--> TODO: add a table in the BD of which player played in which match
+# Player stats page route - shows a single player's stats and trophies
+# TODO: add a history section of last (and all) matches played by this player 
+# --> TODO: add a table in the BD of which player played in which match
 @app.route('/player_stats/<int:player_id>')
 def player_stats(player_id):
     player = Player.query.get(player_id)
@@ -236,14 +251,14 @@ def player_stats(player_id):
         default_photo = DEFAULT_PLAYER_PHOTO_WHITE
     )
 
-#Teams page route - shows all teams so you can click on a team and see their page
+# Teams page route - shows all teams so you can click on a team and see their page
 @app.route('/teams')
 def teams():
-    #empty
+    # empty
     return render_template('teams.html')
 
-#Team page route - shows all players from that team
-#TODO: add a history section of last (and all) matches played by this team (just like the player stats page, but for teams)
+# Team page route - shows all players from that team
+# TODO: add a history section of last (and all) matches played by this team (just like the player stats page, but for teams)
 @app.route('/team_page/<int:team_id>')
 def team_page(team_id):
     team = Team.query.get(team_id)
@@ -266,7 +281,7 @@ def team_page(team_id):
         default_photo = DEFAULT_PLAYER_PHOTO_WHITE
         )
 
-#Standings page route - shows the current standings of the championship
+# Standings page route - shows the current standings of the championship
 @app.route('/standings')
 def standings():
     (all_matches_away, all_matches_home, all_wins_away, all_wins_home, all_losses_away, all_losses_home, all_goals_away, all_goals_home, all_goals_against_away, all_goals_against_home) = get_teams_data()
@@ -322,70 +337,118 @@ def standings():
     
     return render_template('standings.html', teams=team_data)
 
-#Matches page route - shows all matches played in the championship and the next one to come
-#TODO: add a button for admins so that they can create the next matches and edit their results, who played, goals, assists, cards, etc...
-#TODO: add to the pop up page the possibility to add links to the youtube videos of the goals and the instagram post related to that match
+# Matches page route - shows all matches played in the championship and the next one to come
+# TODO: add a button for admins so that they can create the next matches and edit their results, who played, goals, assists, cards, etc...
+# TODO: add to the pop up page the possibility to add links to the youtube videos of the goals and the instagram post related to that match
 @app.route('/matches')
 def matches():
-    #load time test variable start
+    # for loading page time testing purpose this variable is initialized
     start = time.time()
-    #load time test variable end
+
+
+
+
 
     all_matches = get_matches_data()
     match_ids = [match.id for match, _, _, in all_matches]
 
-    #Searches everything at once out of the loop fore fast page loading
+    # Data Base query is done out of the loop for faster page loading!# 
+
+    # creates a list of tuples with 2 objects Player and MatchAppearance such that Player.id == MatchAppearance.player_id is true
     all_appearances = db.session.query(MatchAppearance, Player)\
         .join(Player, MatchAppearance.player_id == Player.id)\
         .filter(MatchAppearance.match_id.in_(match_ids))\
         .all()
 
+    # creates a list of tuples with 2 objects Player and Goal such that Player.id == Goal.player_id is true
     all_goals = db.session.query(Goal, Player)\
         .join(Player, Goal.player_id == Player.id)\
-        .filter(Goal.match_id.in_(match_ids)).all()
+        .filter(Goal.match_id.in_(match_ids))\
+        .all()
 
+    # creates a list of tuples with 2 objects Player and Assist such that Player.id == Assist.player_id is true
     all_assists = db.session.query(Assist, Player)\
         .join(Player, Assist.player_id == Player.id)\
-        .filter(Assist.match_id.in_(match_ids)).all()
+        .filter(Assist.match_id.in_(match_ids))\
+        .all()
 
+    # creates a list of tuples with 2 objects Player and YellowCard such that Player.id == YellowCard.player_id is true
     all_yellow_cards = db.session.query(YellowCard, Player)\
         .join(Player, YellowCard.player_id == Player.id)\
-        .filter(YellowCard.match_id.in_(match_ids)).all()
-
+        .filter(YellowCard.match_id.in_(match_ids))\
+        .all()
+    
+    # creates a list of tuples with 2 objects Player and RedCard such that Player.id == RedCard.player_id is true
     all_red_cards = db.session.query(RedCard, Player)\
         .join(Player, RedCard.player_id == Player.id)\
-        .filter(RedCard.match_id.in_(match_ids)).all()
+        .filter(RedCard.match_id.in_(match_ids))\
+        .all()
 
-    round_ids = [match.round_id for match, _, _, in all_matches]
+    # grabs all the matches_ids that exist in the list of matches (the duplicates are already removed from this list)
+    round_ids = list(set(match.round_id for match, _, _ in all_matches))
+
+    # creates a list of tuples with 2 objects Player and Round such that Player.id == Round.player_of_the_round_id is true
+    all_pora = db.session.query(Round, Player)\
+        .join(Player, Round.player_of_the_round_id == Player.id)\
+        .filter(Round.round_number.in_(round_ids))\
+        .all()
+
+    # creates a list of objects where it includes all TeamOfTheRound which the round_id is found on the list round_ids
     all_round_selections = db.session.query(TeamOfTheRound)\
-        .filter(TeamOfTheRound.round_id.in_(round_ids)).all()
+        .filter(TeamOfTheRound.round_id.in_(round_ids))\
+        .all()
 
-    #Organizes everything in a dictionary by match_id
+
+
+
+
+    # converting list of tuples/objects into dictionaries
+
+    # creates a dictionary where match_id is the key and a list of players that played in the match is the value 
     appearances_by_match = defaultdict(list)
     for appearance, player in all_appearances:
         appearances_by_match[appearance.match_id].append(player)
 
+    # creates a dictionary where match_id is the key and a list of tuples: (goal, player) is the value 
     goals_by_match = defaultdict(list)
     for goal, player in all_goals:
         goals_by_match[goal.match_id].append((goal, player))
 
+    # creates a dictionary where match_id is the key and a list of tuples: (assist, player) is the value 
     assists_by_match = defaultdict(list)
     for assist, player in all_assists:
         assists_by_match[assist.match_id].append((assist, player))
 
+    # creates a dictionary where match_id is the key and the value is a list of tuples: (player, yellow) or (player, red)
     cards_by_match = defaultdict(list)
     for card, player in all_yellow_cards:
         cards_by_match[card.match_id].append((player, "yellow"))
     for card, player in all_red_cards:
         cards_by_match[card.match_id].append((player, "red"))
 
+    # creates a dictionary where match_id is the key and a list of tuples: (pora, player) is the value 
+    pora_by_round = defaultdict(list)
+    for pora, player in all_pora:
+        pora_by_round[pora.round_number] = player
+
+    # creates a dictionary where round_id is the key and the value is a set with all players chosen as team of the round
     round_selected_by_round = defaultdict(set)
     for row in all_round_selections:
         round_selected_by_round[row.round_id].add(row.player_id)
 
-    #This is a dictionary that will hold the matches grouped by date. The key is the date and the value is a list of matches played on that date.
+    print("\n")
+    print(pora_by_round) #ta certo]
+    print("\n")
+
+
+
+
+    # creates a dictionary that will hold the matches grouped by date. 
+    # The key is the date and the value is a list of matches played on that date.
     matches_by_date = {}
-    #This, on the other hand, is a JSON file that contains all the matches details so that the HTML page can display all of it in the pop up page when you click on a match. The key is the match ID and the value is a dictionary with all the match details.
+    # creates a dictionary that contains all the matches details so that the HTML page 
+    # can display all of it in the pop up page when you click on a match. 
+    # The key is match_id and the value is a dictionary with all the match details.
     match_details = {}
 
     for match, home_team, away_team in all_matches:
@@ -405,17 +468,18 @@ def matches():
 
         matches_by_date.setdefault(match_day, []).append(match_data)
 
-        #Details for the pop up page
+        # Details for the pop up page
         if match.match_date:
             local_dt = match.match_date.astimezone(BRASILIA_TZ)
             match_time_str = local_dt.strftime("%H:%M")
         else:
             match_time_str = "Horário não definido"
 
-        #Player of the match: winner of poma (player of the match award)
+        # Player of the match: winner of poma (player of the match award)
         player_of_the_match_data = None
         if match.player_of_the_match_id:
             player_of_the_match = Player.query.get(match.player_of_the_match_id)
+            pora_winner = pora_by_round.get(match.round_id)
             players_of_the_round = round_selected_by_round[match.round_id]
 
             player_of_the_match_data = {
@@ -423,10 +487,10 @@ def matches():
                 "nickname": player_of_the_match.nickname if player_of_the_match.nickname else "",
                 "is_captain": player_of_the_match.captain,
                 "photo": player_of_the_match.photo_url if player_of_the_match.photo_url else DEFAULT_PLAYER_PHOTO_WHITE,
-                "was_round_player": player_of_the_match.id in players_of_the_round,
+                "pora": pora_winner is not None and pora_winner.id in player_of_the_match.id,
             }
 
-        #Players selected for team of the round (if any)
+        # Players selected for team of the round (if any)
         round_selected_ids = round_selected_by_round[match.round_id]
 
         home_players = []
@@ -444,8 +508,10 @@ def matches():
             elif player.team_id == match.away_team_id:
                 away_players.append(player_data)
 
+        print()
+        print(round_selected_ids)
 
-        #Goals
+        # Goals
         goals_data = [
             {
                 "player_name": p.name,
@@ -456,7 +522,7 @@ def matches():
             for g, p in goals_by_match[match.id]
         ]
 
-        #Assists
+        # Assists
         assists_data = [
             {
                 "player_name": p.name,
@@ -466,7 +532,7 @@ def matches():
             for _, p in assists_by_match[match.id]
         ]
 
-        #Cards
+        # Cards
         cards_data = [
             {
                 "player_name": p.name,
@@ -477,7 +543,7 @@ def matches():
             for p, t in cards_by_match[match.id]
         ]
 
-        #JSON file with all details of each match
+        # JSON file with all details of each match
         match_details[match.id] = {
             "home_team_name": home_team.name,
             "away_team_name": away_team.name,
@@ -496,10 +562,10 @@ def matches():
             "cards": cards_data,
         }
 
-    #load time check start
+    # load time check start
     end = time.time()
     print(f"Tempo de execução: {end - start:.3f} segundos")
-    #load time check end
+    # load time check end
 
     return render_template('matches.html', matches_by_date=matches_by_date, match_details = match_details)
 
@@ -510,7 +576,7 @@ def matches():
 
 
 
-#TESTS
+# TESTS
 @app.route('/test_player_page')
 def test_player_page():
     class FakePlayer:
@@ -531,8 +597,8 @@ def test_player_page():
         badge_file='No_Badge.png'
     )
 
-#TODO: quando terminar de codar tudo trocar de true para debug=False
-#--> translation: when you finish coding everything change from true to debug=False
+# TODO: quando terminar de codar tudo trocar de true para debug=False
+# --> translation: when you finish coding everything change from true to debug=False
 if __name__ == '__main__':
     # from livereload import Server
     # server = Server(app.wsgi_app)

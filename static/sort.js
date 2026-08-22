@@ -131,8 +131,12 @@ function abrirModal(matchId) {
     }
 
     // Separa gols por time, usando o nome do time como comparação
-    const homeGoals = data.goals.filter(g => g.team_name === data.home_team_name);
-    const awayGoals = data.goals.filter(g => g.team_name === data.away_team_name);
+    const homeGoals = data.goals.filter(g => 
+        g.own_goal ? g.team_name === data.away_team_name : g.team_name === data.home_team_name
+    );
+    const awayGoals = data.goals.filter(g => 
+        g.own_goal ? g.team_name === data.home_team_name : g.team_name === data.away_team_name
+    );
 
     function renderGoals(goals) {
         if (goals.length === 0) return "";

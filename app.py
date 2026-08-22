@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, abort
+from flask import Flask, session, request, render_template, redirect, url_for, abort
 from models import db, Player, Team, Championship, Standing, Round, Match, MatchAppearance, Goal, Assist, YellowCard, RedCard, TeamOfTheRound, ChampionshipTitle
 from sqlalchemy import func
 from sqlalchemy.orm import aliased
@@ -173,6 +173,30 @@ def main_menu():
     # # # that's it for now # # # 
 
     return render_template('main_menu.html')
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        username = request.form.get('username', '').strip()
+
+        # login consists of a single letter and a number (from 1 to 10.000)
+        # separates the letter from the number
+        letter = username[0].upper()
+        text_id = username[1:]
+
+        if not text_id.isdigit():
+            return render_template('login.html', erro='Login inválido')
+
+        player_id = int(text_id)
+        player = Player.query.get(player_id)
+
+        if player and player.name[0].upper() == letter:
+            session['player_id'] = player.id
+            return redirect(url_for('/player_stats/<int:player_id>'))
+        else:
+            return render_template('login.html', erro='Login inválido')
+
+    return render_template('login.html')
 
 
 # Players page route - shows all players and their current stats

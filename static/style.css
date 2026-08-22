@@ -3,7 +3,7 @@
 :root {
     --color-bg-dark: #121212;
     --color-bg: #12417abb; /*#1a63bc;*/
-    --color-box: #0f0f0f;
+    --color-box: #101010;
     --color-box-hover: #181818;
     --color-text: #dddddd;
     --color-text-white: white;
@@ -594,7 +594,7 @@ tr:hover td { background-color: var(--color-table-hover); }
 
 .match-card {
     margin-top: 10px;
-    border-radius: 25px;
+    border-radius: 15px;
     background-color: var(--color-box);
     border: 2px solid transparent;
     display: flex;
@@ -616,7 +616,7 @@ tr:hover td { background-color: var(--color-table-hover); }
     flex-direction: row;
     align-items: center;
     width: 450px;
-    height: 200px;
+    height: 150px;
 }
 
 .home-team {
@@ -635,6 +635,7 @@ tr:hover td { background-color: var(--color-table-hover); }
 .home-team-name, .away-team-name {
     font-size: 30px;
     font-weight: 600;
+    text-transform: uppercase;
 }
 
 .match-score {
@@ -649,6 +650,7 @@ tr:hover td { background-color: var(--color-table-hover); }
 .score {
     font-size: 40px;
     font-weight: 800;
+    font-variant-numeric: tabular-nums;
 }
 
 .modal-overlay {
@@ -840,7 +842,6 @@ tr:hover td { background-color: var(--color-table-hover); }
 }
 
 .player-of-the-match-box {
-    border: 2px transparent red;
     background-color: var(--color-box-hover);
     border-radius: 25px;   
     height: 480px;
@@ -857,18 +858,20 @@ tr:hover td { background-color: var(--color-table-hover); }
 }
 
 .potm-photo {
-    width: 300px;
+    width: 320px;
     height: auto;
+    margin-top:20px;
     mask-image: linear-gradient(
-        rgba(16,16,16,1) 0%,
-        rgba(16,16,16,1) 70%,
-        rgba(16,16,16,0) 90%,
-        rgba(16,16,16,0) 100%
+        rgba(0,0,0,1) 0%, 
+        rgba(0,0,0,1) 50%,
+        rgba(0,0,0,0) 88%,
+        rgba(0,0,0,0) 100%
     );
 }
 
 .potm-name {
-    margin-top: -40px;
+    margin-top: -60px;
+    font-size: 26px;
 }
 
 .player-of-the-match {

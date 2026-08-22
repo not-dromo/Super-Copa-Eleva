@@ -437,7 +437,7 @@ def matches():
         round_selected_by_round[row.round_id].add(row.player_id)
 
     print("\n")
-    print(pora_by_round) #ta certo]
+    print(pora_by_round) #ta certo
     print("\n")
 
 
@@ -482,12 +482,16 @@ def matches():
             pora_winner = pora_by_round.get(match.round_id)
             players_of_the_round = round_selected_by_round[match.round_id]
 
+            print("pora winner:" + str(pora_winner))
+            print("player of the match winner:" + str(player_of_the_match))
+            print()
+
             player_of_the_match_data = {
                 "name": player_of_the_match.name,
                 "nickname": player_of_the_match.nickname if player_of_the_match.nickname else "",
                 "is_captain": player_of_the_match.captain,
                 "photo": player_of_the_match.photo_url if player_of_the_match.photo_url else DEFAULT_PLAYER_PHOTO_WHITE,
-                "pora": pora_winner is not None and pora_winner.id in player_of_the_match.id,
+                "pora": pora_winner == player_of_the_match,
             }
 
         # Players selected for team of the round (if any)
@@ -508,8 +512,7 @@ def matches():
             elif player.team_id == match.away_team_id:
                 away_players.append(player_data)
 
-        print()
-        print(round_selected_ids)
+        #print(round_selected_ids) jogadores que foram para a seleção da rodada
 
         # Goals
         goals_data = [

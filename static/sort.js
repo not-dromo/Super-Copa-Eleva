@@ -112,16 +112,15 @@ function abrirModal(matchId) {
         potmHtml = /*html*/`
             <div class="modal-potm">
                 <img src="${potm.photo}" class="potm-photo">
-                <hr class="modal-divider">
-                <p class="potm-name">⭐ Destaque: <strong>${potm.nickname ? potm.nickname : potm.name}</strong> ${potm.is_captain ? "(C)" : ""}</p>
-                <p>${potm.was_round_player ? "<p>Também foi Jogador da Rodada</p>" : ""}</p>
+                <p class="potm-name">⭐ <strong>${potm.nickname ? potm.nickname : potm.name}</strong> ${potm.is_captain ? "(C)" : ""}</p>
+                <p class="was_player_of_the_round">${potm.pora ? "<div>poma</div>" : ""}</p>
             </div>
         `;
     }
 
     // Jogadores de cada time (recebe a lista já separada)
     function renderPlayers(players) {
-        if (players.length === 0) return "<p>W.O.</p>";
+        if (players.length === 0) return "<p>time não escalado</p>";
         return players.map(p => /*html*/`
             <div class="modal-player">
                 <img src="${p.photo}" class="modal-player-photo-squad">
@@ -245,11 +244,11 @@ function abrirModal(matchId) {
                 ${cardsHtml}
                 <div class="modal-match-squad">
                     <details class="modal-elenco">
-                        <summary>Elenco ${data.home_team_name}</summary>
+                        <summary>${data.home_team_name}</summary>
                         <div class="modal-team-players">${renderPlayers(data.home_players)}</div>
                     </details>
                     <details class="modal-elenco">
-                        <summary>Elenco ${data.away_team_name}</summary>
+                        <summary>${data.away_team_name}</summary>
                         <div class="modal-team-players">${renderPlayers(data.away_players)}</div>
                     </details>
                 </div>

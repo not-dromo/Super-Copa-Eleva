@@ -123,3 +123,27 @@ class ChampionshipTitle(db.Model):
     __tablename__ = "championship_titles"
     player_id = db.Column(db.Integer, db.ForeignKey('players.id'), primary_key=True)
     championship_year = db.Column(db.Integer, db.ForeignKey('championships.championship_year'), primary_key=True)
+
+#coding the accounts now
+class PendingChange(db.Model):
+    __tablename__ = 'pending_changes'
+
+    id = db.Column(db.Integer, primary_key = True)
+
+    player_id = db.Column(db.Integer, db.ForeignKey('players.id'), nullable=False)
+    player = db.relationship('Player', backref='pending_changes') #duvida: o quye backref'pending_changes' faz?
+
+    field_name = db.Column(db.String(50), nuullable=False)
+    old_value = db.Column(db.Text, nullable=True)
+    new_value = db.Column(db.Text, nullable=False)
+
+    status = db.Column(db.String(20), nullable=False, default='pending')
+    admin_note = db.Column(db.Text, nullable=True)
+
+    created_at = db.Column(db.DataTime, nullable=False, defauult=db.func.now())
+    reviewed_at = db.Column(db.DataTime, nullable=True)
+
+    __table_args__ = (
+        db.CheckConstraint("status IN ('pending', 'approved', 'rejected')", name='check_status_valid'),
+    )
+

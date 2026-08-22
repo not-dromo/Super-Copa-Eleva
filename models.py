@@ -8,8 +8,9 @@ class Player(db.Model):
     name = db.Column(db.String(100), nullable=False)
     nickname = db.Column(db.String(100), nullable=True)
     team_id = db.Column(db.Integer, db.ForeignKey('teams.id'), nullable=True)
-    team = db.relationship('Team', backref='players') #busca o nome do time em class Team
+    team = db.relationship('Team', backref='players')
     captain = db.Column(db.Boolean, default=False)
+    #TODO: change matches_played from a fixed number to a id count from MatchAppearance table
     matches_played = db.Column(db.Integer, nullable=False, default=0)
     championship_titles = db.Column(db.Integer, nullable=False, default=0)
     photo_url = db.Column(db.String, nullable=True)
@@ -131,17 +132,17 @@ class PendingChange(db.Model):
     id = db.Column(db.Integer, primary_key = True)
 
     player_id = db.Column(db.Integer, db.ForeignKey('players.id'), nullable=False)
-    player = db.relationship('Player', backref='pending_changes') #duvida: o quye backref'pending_changes' faz?
+    player = db.relationship('Player', backref='pending_changes')
 
-    field_name = db.Column(db.String(50), nuullable=False)
+    field_name = db.Column(db.String(50), nullable=False)
     old_value = db.Column(db.Text, nullable=True)
     new_value = db.Column(db.Text, nullable=False)
 
     status = db.Column(db.String(20), nullable=False, default='pending')
     admin_note = db.Column(db.Text, nullable=True)
 
-    created_at = db.Column(db.DataTime, nullable=False, defauult=db.func.now())
-    reviewed_at = db.Column(db.DataTime, nullable=True)
+    created_at = db.Column(db.DateTime, nullable=False, default=db.func.now())
+    reviewed_at = db.Column(db.DateTime, nullable=True)
 
     __table_args__ = (
         db.CheckConstraint("status IN ('pending', 'approved', 'rejected')", name='check_status_valid'),

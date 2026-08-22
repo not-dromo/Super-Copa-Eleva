@@ -111,9 +111,9 @@ function abrirModal(matchId) {
         const potm = data.player_of_the_match;
         potmHtml = /*html*/`
             <div class="modal-potm">
+                ${potm.pora ? '<div class="was-player-of-the-round">PORA</div>' : ""}
                 <img src="${potm.photo}" class="potm-photo">
                 <p class="potm-name">⭐ <strong>${potm.nickname ? potm.nickname : potm.name}</strong> ${potm.is_captain ? "(C)" : ""}</p>
-                <p class="was_player_of_the_round">${potm.pora ? "<div>poma</div>" : ""}</p>
             </div>
         `;
     }

@@ -878,6 +878,21 @@ tr:hover td { background-color: var(--color-table-hover); }
     margin: 0px;
     margin-top: 20px;
 }
+
+.was-player-of-the-round{
+    height: 30px;
+    width: 80px;
+    border-radius: 7px;
+    margin-bottom: -35px;
+    margin-left: 190px;
+    color: black;
+    font-weight: bold;
+    text-shadow: 0 1px 0 rgba(255,255,255,0.3);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(135deg, #bf953f, #fcf6ba, #b38728, #fbf5b7, #aa771c);
+}
 /*End of matches.html*/
 
 

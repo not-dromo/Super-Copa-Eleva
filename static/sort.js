@@ -136,12 +136,23 @@ function abrirModal(matchId) {
 
     function renderGoals(goals) {
         if (goals.length === 0) return "";
-        return goals.map(g => /*html*/` 
+
+        // Agrupa os gols por jogador (separando gol contra do gol normal)
+        const grouped = {};
+        goals.forEach(g => {
+            const key = g.player_name + (g.own_goal ? "_og" : "");
+            if (!grouped[key]) {
+                grouped[key] = { ...g, count: 0 };
+            }
+            grouped[key].count++;
+        });
+
+        return Object.values(grouped).map(g => /*html*/`
             <div class="modal-player">
                 <div class="modal-player-photo-wrapper">
                     <img src="${g.photo}" class="modal-player-photo-goal">
                 </div>
-                <div class="modal-goal">${g.player_name}${g.own_goal ? " (gc) " : ""} ⚽</div>
+                <div class="modal-goal">${g.player_name}${g.own_goal ? " (gc) " : ""} ${"⚽".repeat(g.count)}</div>
             </div>
         `).join("");
     }

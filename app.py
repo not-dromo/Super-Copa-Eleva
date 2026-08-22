@@ -21,6 +21,7 @@ load_dotenv()
 
 # TODO: add error message if SQLALCHEMY_DATABASE_URL is not set in the environment variables
 app = Flask(__name__)
+app.config['SECRET_KEY'] = os.getenv('MY_SECRET_KEY')
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
@@ -249,7 +250,6 @@ def players():
 
 # Player stats page route - shows a single player's stats and trophies
 # TODO: add a history section of last (and all) matches played by this player 
-# --> TODO: add a table in the BD of which player played in which match
 @app.route('/player_stats/<int:player_id>')
 def player_stats(player_id):
     player = Player.query.get(player_id)

@@ -1,5 +1,5 @@
 from flask import Flask, session, request, render_template, redirect, url_for, abort
-from models import db, Player, Team, Championship, Standing, Round, Match, MatchAppearance, Goal, Assist, YellowCard, RedCard, TeamOfTheRound, ChampionshipTitle
+from models import db, Player, Team, Championship, Standing, Round, Match, MatchAppearance, Goal, Assist, YellowCard, RedCard, TeamOfTheRound, ChampionshipTitle, PendingChange
 from sqlalchemy import func
 from sqlalchemy.orm import aliased
 import models
@@ -186,18 +186,59 @@ def login():
         text_id = username[1:]
 
         if not text_id.isdigit():
-            return render_template('login.html', erro='Login inválido')
+            return render_template('login.html', error='Login inválido')
 
         player_id = int(text_id)
         player = Player.query.get(player_id)
 
         if player and player.name[0].upper() == letter:
             session['player_id'] = player.id
-            return redirect(url_for('/player_stats/<int:player_id>'))
+            return redirect(url_for('player_stats', player_id = player.id))
         else:
             return render_template('login.html', erro='Login inválido')
 
     return render_template('login.html')
+
+@app.route('/editar_perfil', methods=['GET', 'POST'])
+def edit_profile():
+    player_id = session.get('player_id')
+    if not player_id:
+        return redirect(url_for('login'))
+
+    player = Player.query.get(player_id)
+    if player is None:
+        abort(404)
+
+    active_pendencies = PendingChange.query.filter_by(
+        player_id = player.id, status = 'pending'
+    ).all()
+    fields_blocked = {p.field_name for p in active_pendencies}
+
+    if request.method == 'POST':
+        new_name = request.form.get('name', '').strip()
+        new_nickname = request.form.get('nickname', '').strip()
+
+        if 'name' not in fields_blocked and new_name and new_name != player.name:
+            db.session.add(PendingChange(
+                player_id = player.id,
+                field_name = 'name',
+                old_value = player.name,
+                new_value = new_name
+            ))
+
+        if 'nickname' not in fields_blocked and new_nickname and new_nickname != (player.nickname or ''):
+            db.session.add(PendingChange(
+                player_id = player.id,
+                field_name = 'nickname',
+                old_value = player.nickname,
+                new_value = new_nickname
+            ))
+
+        db.session.commit()
+
+        return redirect(url_for('player_stats', player_id = player.id))
+
+    return render_template('edit_profile.html', player=player, fields_blocked=fields_blocked)
 
 
 # Players page route - shows all players and their current stats
@@ -242,8 +283,8 @@ def players():
         for p, goals, assists, yellow_cards, red_cards, player_of_the_match, player_of_the_round, team_of_the_rounds in results
     ]
 
-    for p in players_data:
-        print("id: " + str(p["id"]) + " - name: " + str(p["name"]) + "\n")
+    # for p in players_data:
+    #     print("id: " + str(p["id"]) + " - name: " + str(p["name"]) + "\n")
     
     return render_template('players.html', players=players_data)
 
@@ -260,6 +301,8 @@ def player_stats(player_id):
     badge_file = TEAM_BADGES.get(player.team_id, 'No_Badge.png')
 
     (player_goals, player_assists, player_yellow_cards, player_red_cards, player_poma, player_pora, player_totr) = get_single_player_data(player_id)
+
+    is_own_profile = session.get('player_id') == player_id
     
     return render_template(
         'player_stats.html', 
@@ -272,7 +315,8 @@ def player_stats(player_id):
         pora=player_pora, 
         totr=player_totr,
         badge_file=badge_file,
-        default_photo = DEFAULT_PLAYER_PHOTO_WHITE
+        default_photo = DEFAULT_PLAYER_PHOTO_WHITE,
+        is_own_profile = is_own_profile
     )
 
 # Teams page route - shows all teams so you can click on a team and see their page
@@ -353,11 +397,6 @@ def standings():
     ]
 
     team_data.sort(key=lambda t: (t["points"], t["wins"], t["goal_difference"], t["goals_for"]), reverse=True)
-
-    print("\n\n\ndebuggando\n")
-    for team in team_data:
-        print(team)
-    print("\n\n\n")
     
     return render_template('standings.html', teams=team_data)
 
@@ -460,10 +499,6 @@ def matches():
     for row in all_round_selections:
         round_selected_by_round[row.round_id].add(row.player_id)
 
-    print("\n")
-    print(pora_by_round) #ta certo
-    print("\n")
-
 
 
 
@@ -505,10 +540,6 @@ def matches():
             player_of_the_match = Player.query.get(match.player_of_the_match_id)
             pora_winner = pora_by_round.get(match.round_id)
             players_of_the_round = round_selected_by_round[match.round_id]
-
-            print("pora winner:" + str(pora_winner))
-            print("player of the match winner:" + str(player_of_the_match))
-            print()
 
             player_of_the_match_data = {
                 "name": player_of_the_match.name,

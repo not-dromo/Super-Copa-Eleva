@@ -4,7 +4,12 @@
 
 {% block content %}
 
+    {% if is_own_profile %}
+        <a href="{{ url_for('teams') }}" class="btn-editar">Editar perfil</a>
+    {% endif %}
+
 <div class="all-content-of-player-stats">
+
     <div class="player-display">
         <div class="display-box">
             <img src="{{ url_for('static', filename='images/Team_badges/' ~ badge_file) }}" class="team-badge">

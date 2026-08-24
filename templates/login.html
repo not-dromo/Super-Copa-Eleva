@@ -3,13 +3,15 @@
 {% block content %}
 <h2>Login</h2>
 
-{% if erro %}
+{% if error %}
   <p style="color: red;">{{ erro }}</p>
 {% endif %}
 
 <form method="POST">
+  <div style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
     <label for="username">Login:</label>
-    <input type="text" id="username" name="username" required>
-    <button type="submit">Entrar</button>
+    <input type="text" style="color: black" id="username" name="username" required>
+    <button type="submit" style="color: black">Entrar</button>
+  </div>
 </form>
 {% endblock %}

@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Editar Perfil</h2>
+
+<form method="POST" onsubmit="return confirmChange(event)">
+    <label for="name">Nome:</label>
+    <input type="text" id="name" name="name" value="{{ player.name }}"
+        {% if 'name' in campos_bloqueados %}disabled{% endif %}>
+    {% if 'name' in campos_bloqueados %}
+        <p style="color: gray;">Já existe uma alteração de nome esperando aprovação.</p>
+    {% endif %}
+
+    <label for="nickname">Apelido:</label>
+    <input type="text" id="nickname" name="nickname" value="{{ player.nickname or '' }}"
+        {% if 'nickname' in campos_bloqueados %}disabled{% endif %}>
+    {% if 'nickname' in campos_bloqueados %}
+        <p style="color: gray;">Já existe uma alteração de apelido esperando aprovação.</p>
+    {% endif %}
+
+    <button type="submit">Salvar alterações</button>
+</form>
+{% endblock %}

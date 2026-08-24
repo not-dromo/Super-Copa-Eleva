@@ -280,7 +280,11 @@ function abrirModal(matchId) {
     document.body.style.overflow = "hidden";
 }
 
-
+function confirmChange(event) {
+    const nome = document.getElementById('name').value;
+    const apelido = document.getElementById('nickname').value;
+return confirm(`Tem certeza que quer alterar seu nome para "${nome}" e apelido para "${apelido}"?`);
+}
 
 
 

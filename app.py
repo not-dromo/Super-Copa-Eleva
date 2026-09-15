@@ -10,6 +10,7 @@ import cloudinary.uploader
 from cloudinary.utils import cloudinary_url
 from zoneinfo import ZoneInfo
 from collections import defaultdict
+from admin import admin_bp
 # for tests
 import time
 
@@ -157,6 +158,9 @@ app.jinja_env.filters['format_date_pt'] = format_date_pt
 
 
 # ROUTES↓
+
+app.register_blueprint(admin_bp)
+
 @app.route('/')
 def index():
     # empty for now

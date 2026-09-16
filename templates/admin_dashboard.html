@@ -2,79 +2,81 @@
 
 {% block content %}
 
-<h2> Alterações Pendentes </h2>
+<h2 class="page-title"> Alterações Pendentes </h2>
 
 {% if pendings|length == 0 %}
     <p> Nenhuma alteração pendente no momento</p>
 {% endif %}
 
-{% for pending in pendings %}
-<div class="pending-card">
-    <div class="pending-info">
+<div class="all-pending-cards">
+    {% for pending in pendings %}
+    <div class="pending-card">
+        <div class="pending-info">
 
-        <div class="old-profile-info">
-            <img src="{{ pending.player.photo_url or default_photo }}" alt="foto" class="old-photo">
-            <div class="old-name-nickname">
-                <p>{{ pending.player.name }}</p>
-                <p>{{ pending.player.nickname }}</p>
+            <div class="old-profile-info">
+                <img src="{{ pending.player.photo_url or default_photo }}" alt="foto" class="old-photo">
+                <div class="old-name-nickname">
+                    <p>{{ pending.player.name }}</p>
+                    <p>{{ pending.player.nickname or '[vazio]' }}</p>
+                </div>
             </div>
-        </div>
 
-        <div class="changes">
-            {% if pending.field_name == 'name' %}
-                <p>Novo nome no perfil {{ pending.player.name }}</p>
-            {% elif pending.field_name == 'nickname' %}
-                <p>Novo apelido no perfil {{ pending.player.name }}</p>
-            {% elif pending.field_name == 'photo_url' %}
-                <p>Imagem nova no perfil {{ pending.player.name }}</p>
-            {% endif %}
-
-            <div class="pending-valores">
-                <span class="valor-antigo">{{ pending.old_value or '(vazio)' }}</span>
-                →
-                <span class="valor-novo">{{ pending.new_value }}</span>
-            </div>
-        </div>
-
-        <div class="new-profile-info">
+            <div class="changes">
                 {% if pending.field_name == 'name' %}
-                    <img src="{{ pending.player.photo_url or default_photo }}" alt="foto" class="old-photo">
-                    <div class="old-name-nickname">
-                        <p>{{ pending.new_value }}</p>
-                        <p>{{ pending.player.nickname }}</p>
-                    </div>
+                    <p>Mudança de Nome</p>
                 {% elif pending.field_name == 'nickname' %}
-                    <img src="{{ pending.player.photo_url or default_photo }}" alt="foto" class="old-photo">
-                    <div class="old-name-nickname">
-                        <p>{{ pending.player.name }}</p>
-                        <p>{{ pending.new_value }}</p>
-                    </div>
+                    <p>Mudança de Apelido</p>
                 {% elif pending.field_name == 'photo_url' %}
-                    <img src="{{ pending.new_value or default_photo }}" alt="foto" class="old-photo">
-                    <div class="old-name-nickname">
-                        <p>{{ pending.player.name }}</p>
-                        <p>{{ pending.player.nickname }}</p>
-                    </div>
+                    <p>Mudança de Imagem</p>
                 {% endif %}
+
+                <div class="pending-valores">
+                    <span class="valor-antigo">{{ pending.old_value or '[vazio]' }}</span>
+                    →
+                    <span class="valor-novo">{{ pending.new_value }}</span>
+                </div>
+            </div>
+
+            <div class="new-profile-info">
+                    {% if pending.field_name == 'name' %}
+                        <img src="{{ pending.player.photo_url or default_photo }}" alt="foto" class="new-photo">
+                        <div class="new-name-nickname">
+                            <p>{{ pending.new_value }}</p>
+                            <p>{{ pending.player.nickname }}</p>
+                        </div>
+                    {% elif pending.field_name == 'nickname' %}
+                        <img src="{{ pending.player.photo_url or default_photo }}" alt="foto" class="new-photo">
+                        <div class="new-name-nickname">
+                            <p>{{ pending.player.name }}</p>
+                            <p>{{ pending.new_value }}</p>
+                        </div>
+                    {% elif pending.field_name == 'photo_url' %}
+                        <img src="{{ pending.new_value or default_photo }}" alt="foto" class="new-photo">
+                        <div class="new-name-nickname">
+                            <p>{{ pending.player.name }}</p>
+                            <p>{{ pending.player.nickname }}</p>
+                        </div>
+                    {% endif %}
+            </div>
+
         </div>
 
-    </div>
 
-
-    <div class="pending-acoes">
-        <form method="POST" action="{{ url_for('admin.approve_pendency', pending_id=pending.id) }}" style="display:inline;">
-            <button type="submit">Aprovar</button>
-        </form>
-
-        <button type="button" onclick="document.getElementById('rejeitar-{{ pending.id }}').style.display='block'">Rejeitar</button>
-
-        <div id="rejeitar-{{ pending.id }}" style="display:none;">
-            <form method="POST" action="{{ url_for('admin.approve_pendency', pending_id=pending.id) }}">
-                <input type="text" name="admin_note" placeholder="Motivo da rejeição" required>
-                <button type="submit">Confirmar rejeição</button>
+        <div class="pending-acoes">
+            <form method="POST" action="{{ url_for('admin.approve_pendency', pending_id=pending.id) }}" style="display:inline;">
+                <button type="submit">Aprovar</button>
             </form>
+
+            <button type="button" onclick="document.getElementById('rejeitar-{{ pending.id }}').style.display='block'">Rejeitar</button>
+
+            <div id="rejeitar-{{ pending.id }}" style="display:none;">
+                <form method="POST" action="{{ url_for('admin.approve_pendency', pending_id=pending.id) }}">
+                    <input type="text" name="admin_note" placeholder="Motivo da rejeição" required>
+                    <button type="submit">Confirmar rejeição</button>
+                </form>
+            </div>
         </div>
     </div>
+    {% endfor %}
 </div>
-{% endfor %}
 {% endblock %}

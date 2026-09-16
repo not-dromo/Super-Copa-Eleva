@@ -914,24 +914,48 @@ tr:hover td { background-color: var(--color-table-hover); }
 
 
 /*Start of admin_dashboard.html*/
+.page-title{
+    margin-left: 350px;
+}
+
+.all-pending-cards{
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.pending-card{
+    background-color: var(--color-box);
+    border-radius: 15px;
+    height: 300px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 0 30px 20px 30px;
+    margin: 20px;
+}
+
 .pending-info {
-    border: 2px solid red;
+    height: 300px;
     display: flex;
     flex-direction: row;
     justify-content: center;
+    align-items: center;
 }
 
 .old-profile-info {
-    border: 5px solid white;
+    border: 3px solid white;
     display: flex;
     flex-direction: row;
 }
 
 .old-photo{
-    border: 2px solid green;
+    border: 2px solid white;
     width: 150px;
-    height: auto;
-
+    height: 200px;
 }
 
 .changes {
@@ -939,16 +963,31 @@ tr:hover td { background-color: var(--color-table-hover); }
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    width: 400px;
 }
 
 .old-name-nickname {
-    border:2px solid blue;
+    border: 2px solid white;
+    padding: 10px;
+    width: 200px;
 }
 
 .new-profile-info {
-    border: 5px solid white;
+    border: 3px solid white;
     display: flex;
     flex-direction: row;
+}
+
+.new-photo{
+    border: 2px solid white;
+    width: 150px;
+    height: 200px;
+}
+
+.new-name-nickname {
+    border: 2px solid white;
+    padding: 10px;
+    width: 200px;
 }
 /*End of admin_dashboard.html*/
 

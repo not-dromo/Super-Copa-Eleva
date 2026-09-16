@@ -158,7 +158,6 @@ app.jinja_env.filters['format_date_pt'] = format_date_pt
 
 
 # ROUTES↓
-
 app.register_blueprint(admin_bp)
 
 @app.route('/')

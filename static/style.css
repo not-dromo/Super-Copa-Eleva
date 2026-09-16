@@ -44,6 +44,10 @@ a:link {
 h1, p {
     color: var(--color-text-white);
 }
+
+button {
+    color: black;
+}
 /*End of Universal Defenitions*/
 
 

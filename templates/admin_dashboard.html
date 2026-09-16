@@ -10,23 +10,56 @@
 
 {% for pending in pendings %}
 <div class="pending-card">
-    <img src="{{ pending.player.photo_url or default_photo }}" alt="foto" class="pending-avatar">
-
     <div class="pending-info">
-        {% if pending.field_name == 'name' %}
-            <p>Novo nome no perfil de {{ pending.player.name }}</p>
-        {% elif pending.field_name == 'nickname' %}
-            <p>Novo apelido no perfil de {{ pending.player.name }}</p>
-        {% elif pending.field_name == 'photo_url' %}
-            <p>Imagem nova no perfil de {{ pending.player.name }}</p>
-        {% endif %}
 
-        <div class="pending-valores">
-            <span class="valor-antigo">{{ pending.old_value or '(vazio)' }}</span>
-            →
-            <span class="valor-novo">{{ pending.new_value }}</span>
+        <div class="old-profile-info">
+            <img src="{{ pending.player.photo_url or default_photo }}" alt="foto" class="old-photo">
+            <div class="old-name-nickname">
+                <p>{{ pending.player.name }}</p>
+                <p>{{ pending.player.nickname }}</p>
+            </div>
         </div>
+
+        <div class="changes">
+            {% if pending.field_name == 'name' %}
+                <p>Novo nome no perfil {{ pending.player.name }}</p>
+            {% elif pending.field_name == 'nickname' %}
+                <p>Novo apelido no perfil {{ pending.player.name }}</p>
+            {% elif pending.field_name == 'photo_url' %}
+                <p>Imagem nova no perfil {{ pending.player.name }}</p>
+            {% endif %}
+
+            <div class="pending-valores">
+                <span class="valor-antigo">{{ pending.old_value or '(vazio)' }}</span>
+                →
+                <span class="valor-novo">{{ pending.new_value }}</span>
+            </div>
+        </div>
+
+        <div class="new-profile-info">
+                {% if pending.field_name == 'name' %}
+                    <img src="{{ pending.player.photo_url or default_photo }}" alt="foto" class="old-photo">
+                    <div class="old-name-nickname">
+                        <p>{{ pending.new_value }}</p>
+                        <p>{{ pending.player.nickname }}</p>
+                    </div>
+                {% elif pending.field_name == 'nickname' %}
+                    <img src="{{ pending.player.photo_url or default_photo }}" alt="foto" class="old-photo">
+                    <div class="old-name-nickname">
+                        <p>{{ pending.player.name }}</p>
+                        <p>{{ pending.new_value }}</p>
+                    </div>
+                {% elif pending.field_name == 'photo_url' %}
+                    <img src="{{ pending.new_value or default_photo }}" alt="foto" class="old-photo">
+                    <div class="old-name-nickname">
+                        <p>{{ pending.player.name }}</p>
+                        <p>{{ pending.player.nickname }}</p>
+                    </div>
+                {% endif %}
+        </div>
+
     </div>
+
 
     <div class="pending-acoes">
         <form method="POST" action="{{ url_for('admin.approve_pendency', pending_id=pending.id) }}" style="display:inline;">

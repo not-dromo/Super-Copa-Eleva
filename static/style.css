@@ -913,6 +913,53 @@ tr:hover td { background-color: var(--color-table-hover); }
 
 
 
+/*Start of admin_dashboard.html*/
+.pending-info {
+    border: 2px solid red;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+}
+
+.old-profile-info {
+    border: 5px solid white;
+    display: flex;
+    flex-direction: row;
+}
+
+.old-photo{
+    border: 2px solid green;
+    width: 150px;
+    height: auto;
+
+}
+
+.changes {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.old-name-nickname {
+    border:2px solid blue;
+}
+
+.new-profile-info {
+    border: 5px solid white;
+    display: flex;
+    flex-direction: row;
+}
+/*End of admin_dashboard.html*/
+
+
+
+
+
+
+
+
+
 /*Start of Misc / Unclassified*/
 .team_name_and_badge {
     border: 8px solid #000000;
